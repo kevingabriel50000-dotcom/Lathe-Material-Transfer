@@ -7,7 +7,8 @@
     "stage": "node scripts/stage.cjs",
     "start": "npm run stage && electron .stage",
     "test": "npm run stage && node scripts/smoke.cjs",
-    "package": "npm run stage && electron-builder --win zip --x64 --publish never"
+    "package": "npm run stage && electron-builder --win zip --x64 --publish never",
+    "test:packaged": "node scripts/smoke.cjs --packaged"
   },
   "devDependencies": {
     "electron": "45.1.0",
@@ -22,9 +23,20 @@
       "output": "dist"
     },
     "asar": true,
-    "files": ["main.cjs", "package.json", "web/**/*"],
+    "files": [
+      "main.cjs",
+      "package.json",
+      "web/**/*"
+    ],
     "win": {
-      "target": [{"target": "zip", "arch": ["x64"]}],
+      "target": [
+        {
+          "target": "zip",
+          "arch": [
+            "x64"
+          ]
+        }
+      ],
       "executableName": "Lathe Material Transfer",
       "signAndEditExecutable": false
     },

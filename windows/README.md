@@ -6,7 +6,7 @@ This wrapper uses `../web/` directly as its source. There is no second copy to e
 
 Open the repository's **Actions → Windows portable**, select a successful run and download the **Lathe-Material-Transfer-v1.5-Windows-x64** artifact. Extract the downloaded archive and the application ZIP inside it. Keep all extracted application files together and run **Lathe Material Transfer.exe**.
 
-The workflow runs an Electron smoke test on Windows before packaging. Artifacts expire after 90 days; run the workflow again from Actions when necessary. This does not create or change release tags.
+The workflow runs Electron smoke tests on Windows before packaging and on the packaged executable. Artifacts expire after 90 days; run the workflow again from Actions when necessary. This does not create or change release tags.
 
 ## Build on Windows
 
@@ -16,6 +16,7 @@ Install Node.js 24, open a terminal in `windows/`, then run:
 npm ci
 npm test
 npm run package
+npm run test:packaged
 ```
 
 The ZIP is written to `dist/Lathe-Material-Transfer-v1.5-Windows-x64.zip`. The extracted application folder contains the executable, Electron runtime files and the packaged web application. `npm start` opens a development window.

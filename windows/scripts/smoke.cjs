@@ -8,9 +8,10 @@ const os=require('node:os');
  const dataDirectory=fs.mkdtempSync(path.join(os.tmpdir(),'lathe-desktop-'));
  let application;
  try{
-  const launchArgs=[path.resolve(__dirname,'..','.stage')];
+  const packaged=process.argv.includes('--packaged');
+  const launchArgs=packaged?[]:[path.resolve(__dirname,'..','.stage')];
   if(process.platform==='linux')launchArgs.unshift('--no-sandbox');
-  const launch=()=>electron.launch({args:launchArgs,env:{...process.env,LATHE_DATA_DIR:dataDirectory},timeout:30000});
+  const launch=()=>electron.launch({...packaged?{executablePath:path.resolve(__dirname,'..','dist','win-unpacked','Lathe Material Transfer.exe')}:{},args:launchArgs,env:{...process.env,LATHE_DATA_DIR:dataDirectory},timeout:30000});
   application=await launch();
   let page=await application.firstWindow();
   await page.waitForLoadState();
