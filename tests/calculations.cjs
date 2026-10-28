@@ -34,6 +34,6 @@ near(cut.left,2);near(cut.right,2.118);near(cut.clearance,.382);near(cut.partLen
 assert.throws(()=>ctx.cutGeometry({...cutInput,end:0},ctx.calculate({...cutInput,end:0})));
 assert.throws(()=>ctx.cutGeometry({...cutInput,cutZ:-2},cutResult));
 assert.throws(()=>ctx.cutGeometry({...cutInput,cutZ:5},cutResult));
-assert.throws(()=>ctx.cutGeometry({...cutInput,toolRadius:.1},cutResult));
+assert.throws(()=>ctx.cutGeometry({...cutInput,toolWidth:.02},cutResult));
 assert.throws(()=>ctx.cutGeometry({...cutInput,diameter:0},cutResult));
 console.log('Cut-off kerf, part length, insert-to-jaw clearance and validation checks passed.');
