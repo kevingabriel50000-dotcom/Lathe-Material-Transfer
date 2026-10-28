@@ -1,5 +1,7 @@
 # Lathe Material Transfer v1.5
 
+## [▶ Open simulator](https://kevingabriel50000-dotcom.github.io/Lathe-Material-Transfer/)
+
 Portable, main/sub spindle transfer visualizer. Open `web/index.html` in Edge, Chrome or Firefox, or use the GitHub Pages deployment. No build step, dependencies or Internet connection are required for the downloaded file.
 
 ## Project folders
