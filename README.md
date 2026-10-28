@@ -1,16 +1,34 @@
-# Lathe Material Transfer v1.0
+# Lathe Material Transfer v1.1
 
-Visualizador portátil en español para la transferencia main/sub spindle. Abre `index.html` directamente en Chrome, Edge o Firefox. No requiere instalación, servidor, Internet ni cuenta. Copia ese archivo a otra computadora para usarlo allí.
+Portable, English-language main/sub spindle transfer visualizer. Open `index.html` in Edge, Chrome or Firefox, or use the GitHub Pages deployment. No build step, dependencies or Internet connection are required for the downloaded file.
 
-- Vista lateral y reproducción por etapas: grab, main abre, pull, main cierra y estado posterior al cut-off.
-- Cálculo desde agarre/salida física deseados o desde posiciones B existentes.
-- Referencia Stock front o Model front, material frontal retirado y sustituto configurable del destino B0.
-- Guardar y abrir parámetros como JSON.
+## Setup
 
-Las medidas están en pulgadas. La salida inicial siempre mide desde los jaws del main hasta el stock sin desbastar. Model front se interpreta como la cara terminada tras retirar el excedente frontal. G54 permanece fijo y B0 alinea la cara de los jaws del sub con G54 Z0. El modelo asume desplazamiento B positivo hacia la derecha.
+Enter the **chuck face-to-face distance with the sub at its machine return position**, excluding jaws. This distance establishes a fixed view scale; changing transfer planes does not rescale the machine or move the fixed G54 origin. The sub chuck moves during the transfer, so instantaneous chuck separation changes.
 
-El ejemplo del código G usa stock 2, desbaste 0.025, grab B-1 y destino B0.0001: agarre real 0.975, pull 1.0001 y cara final 2.9751 pulgadas.
+Main jaw length defaults to **1.5 in**, sub jaw length to **1.0 in**, both editable. The distance is intentionally blank: a Lynx 2100LSY chuck-face distance has not been verified. Manufacturer/distributor web requests were blocked in the development environment. Do not substitute between-centers distance, turning length or axis travel for this measurement. These are different dimensions. Use the machine documentation or a measured return-position distance.
 
-Esta versión no importa G-code, no genera código para máquina y no valida colisiones. No calcula aún el plano de cut-off, el retorno G28 G53 ni G55; la última etapa indica la separación sin representar una longitud de corte inventada.
+A new browser starts with zero transfer inputs and prompts for setup. The last inputs are automatically restored in that browser when local storage is available. **New case** resets transfer inputs while preserving machine geometry. JSON case files provide explicit backups and transfers between computers. v1.0 case imports remain supported; add machine geometry after importing them.
 
-Validación de cálculos: `node tests/calculations.cjs`.
+## Linked values
+
+There is one transfer, with two editable representations:
+
+- **Actual grip + Finished face protrusion** calculate **Grab Plane + Return Plane**.
+- Editing either plane recalculates actual grip and finished face protrusion.
+- Shared setup changes preserve whichever pair was edited last, identified below the fields.
+- The optional B0 substitution applies only to calculated return positions, never direct plane entries. Requested and actual protrusion are both reported if the substitution introduces a difference.
+
+**Stick Out/protruding** is the initial stock-front distance from the main jaw face. **Front stock** is the frontal allowance removed before grab. Model front is interpreted as the finished face after removal. G54 is fixed during motion, and B0 aligns the sub jaw face with G54 Z0. Positive physical and B movement is to the right.
+
+Example: Stick Out 2, Front stock 0.025, Grab Plane -1, Return Plane 0.0001 gives actual grip 0.975, pull travel 1.0001 and final finished face 2.9751 in.
+
+## Animation and scope
+
+The sub approaches from its configured return position with smooth acceleration/deceleration before clamping. Stage controls and pull slider allow inspection. The static machine scale includes real axial jaw lengths. Basic checks reject overlap with the main jaw plane, overlong grip and motion outside the configured return-position envelope. These schematic checks do not validate a machine program or actual collision clearances.
+
+Cut-off is a status stage only: its location, separated part geometry, G28 G53 return movement and G55 are not modeled yet. No G-code import, CNC output or synchronization validation is provided.
+
+## Validation
+
+`node tests/calculations.cjs` checks calculation examples, both-direction equivalence and geometry constraints. For browser regression checks, with Playwright available, start `python3 -m http.server 8765 --bind 127.0.0.1` and run `node tests/browser.cjs`. Optionally set `CHROMIUM_PATH` to a browser executable or `APP_URL` to a different local test server. The 20-inch distance in that test is synthetic, not a Lynx specification. No application build is needed.

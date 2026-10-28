@@ -10,3 +10,18 @@ r=ctx.calculate({...base,mode:'physical',reference:'model'});near(r.O,1.975);nea
 r=ctx.calculate({...base,allowance:0});near(r.grip,1);near(r.front,3.0001);
 assert.throws(()=>ctx.calculate({...base,grab:.5}));assert.throws(()=>ctx.calculate({...base,allowance:3}));assert.throws(()=>ctx.calculate({...base,end:-2}));assert.throws(()=>ctx.calculate({...base,stock:NaN}));
 console.log('9 calculation and validation scenarios passed.');
+// Synthetic machine geometry; not a manufacturer specification.
+const machine={...base,chuckDistance:20,mainJaw:1.5,subJaw:1};
+const g=ctx.geometry(machine);near(g.home,17.5);
+assert.equal(ctx.geometry({...machine,end:5}).scale,g.scale);
+ctx.validateEnvelope(machine,ctx.calculate(machine),g);
+assert.throws(()=>ctx.geometry({...machine,chuckDistance:0}));
+assert.throws(()=>ctx.geometry({...machine,mainJaw:-1}));
+assert.throws(()=>ctx.validateEnvelope(machine,ctx.calculate({...machine,grab:-1.5}),g));
+assert.throws(()=>ctx.validateEnvelope(machine,ctx.calculate({...machine,end:30}),g));
+for(const reference of ['stock','model']){
+ const v={...machine,reference,mode:'physical',target:3,grip:1,epsilon:0};
+ const physical=ctx.calculate(v),planes=ctx.calculate({...v,mode:'fusion',grab:physical.grab,end:physical.end});
+ near(planes.grip,1);near(planes.front,3);near(planes.O,physical.O);
+}
+console.log('Geometry, fixed scale, envelope and bidirectional calculation checks passed.');
