@@ -19,7 +19,7 @@ input:disabled{opacity:.6}button:disabled{opacity:.4;cursor:default}.field-pair{
 <div class="field-pair"><div><label for="grip">Actual grip (in)</label><input id="grip" type="number" step="0.0001" value="0"></div><div><label for="target">Actual Protrusion (in)</label><input id="target" type="number" step="0.0001" value="0"></div></div>
 
 <div id="cutFields" hidden><h2 style="margin-top:24px">Cut-off</h2><label for="cutZ">Cut-off plane (G54 Z, in)</label><input id="cutZ" type="number" step="0.0001" value="0"><label for="diameter">Bar diameter at cut (in)</label><input id="diameter" type="number" min="0" step="0.0001" value="1"><label for="toolWidth">Insert width (in)</label><input id="toolWidth" type="number" min="0" step="0.0001" value="0.118"><p class="muted">Visual representation only; not exact tool geometry.</p></div><p id="error" role="alert"></p><div class="actions"><button id="save">Save case</button><button id="reset">New case</button></div><label for="load">Open saved case</label><input id="load" type="file" accept="application/json,.json">
-</aside><div><section><h2>Fixed machine view</h2><div class="grid"><div class="metric"><small>Actual grip</small><strong id="gripOut">—</strong></div><div class="metric"><small>Pull travel</small><strong id="pullOut">—</strong></div><div class="metric"><small>Actual Protrusion</small><strong id="frontOut">—</strong></div></div>
+</aside><div><section><h2>Fixed machine view</h2><div class="grid"><div class="metric"><small>Actual grip</small><strong id="gripOut">—</strong></div><div class="metric"><small>Pull travel</small><strong id="pullOut">—</strong></div><div class="metric"><small>Actual Protrusion</small><strong id="frontOut">—</strong></div><div id="subCutMetric" class="metric" hidden><small>Sub jaw → Sub-held part cut face</small><strong id="subCutOut">—</strong></div></div>
 <label for="zoom">Zoom</label><input id="zoom" type="range" min="1" max="5" step="0.01" value="1"><label for="returnMode">Return</label><select id="returnMode"><option value="empty">Return without material</option><option value="material">Return with material</option></select><button id="resetView" style="width:auto;margin-top:12px">Reset view</button><svg id="view" viewBox="0 0 1000 420" role="img" aria-label="Side view of main and sub spindle material transfer"></svg><div id="steps"></div><label for="progress">Pull travel</label><input id="progress" type="range" min="0" max="100" value="0"><div class="actions"><button id="play">▶ Play trajectory</button><button id="resetTrajectory">Reset trajectory</button></div><div id="returnDistances" hidden><table><tbody id="returnResults"></tbody></table></div><p id="state"></p><p id="message" role="status"></p><p id="notice" role="status"></p></section>
 <section style="margin-top:20px"><h2>Positions and references</h2><table><thead><tr><th>Quantity</th><th>Value</th></tr></thead><tbody id="results"></tbody></table>
 
@@ -93,7 +93,7 @@ function update(save=true){
 }
 function draw(){
  const r=result,g=machine,v=values;
- if(!g){$('view').innerHTML='';$('state').textContent='';$('returnDistances').hidden=true;return;}
+ if(!g){$('view').innerHTML='';$('state').textContent='';$('returnDistances').hidden=true;$('subCutMetric').hidden=true;return;}
  const scale=g.scale,x=n=>70+(n-g.left)*scale,zoom=Number($('zoom').value),cy=195;
  const material=v.returnMode==='material',returnStage=material?7:6;
  const p=stage<3?0:stage===3?Number($('progress').value)/100:1,d=r?r.pull*p:0;
@@ -118,11 +118,13 @@ function draw(){
  svg+=line(0,'#aebdd1','Main jaw · 0',335)+line(g.home,'#63758e','Sub jaw at return',365);
  label(-v.mainJaw,'#9bacc3','MAIN CHUCK',40);label(jaw+v.subJaw,'#9bacc3','SUB CHUCK',40);label(jaw,'#cbd7e8','Sub jaw · '+(r?fmt(jaw-r.O):'—'),100);
  const atHome=material&&cut&&stage===returnStage&&returnTravel>=1;
- const modelFace=atHome?cut.left-v.allowance:r?r.F+d+(separated?shift:0):0;
+ const modelFace=atHome?r.O-v.allowance:r?r.F+d+(separated?shift:0):0;
  if(r){const frontStockStart=atHome?modelFace:r.F;svg+=`<rect x="${x(frontStockStart)}" y="${cy-radius*scale}" width="${v.allowance*scale}" height="${2*radius*scale}" fill="none" stroke="#ffbd73" ${planeStroke}/>`+line(r.O,'#c79cff','G54 · Z0 / B0',85,'g54Plane')+line(modelFace,'#55cbb7','Model face · '+fmt(modelFace),300,'modelPlane');}
  $('returnDistances').hidden=!atHome;
+ $('subCutMetric').hidden=!separated;$('subCutOut').textContent=separated?fmt(jaw-(cut.right+shift)):'—';
+ if(separated){const face=cut.right+shift,dimensionY=cy+radius*scale+18;svg+=line(face,'#ffca81','Sub-held part cut face',345,'subPartCutPlane');svg+=`<path id="subPartDimension" data-face="${face}" data-jaw="${jaw}" d="M ${x(face)} ${dimensionY-5} V ${dimensionY+5} M ${x(face)} ${dimensionY} H ${x(jaw)} M ${x(jaw)} ${dimensionY-5} V ${dimensionY+5}" fill="none" stroke="#ffca81" vector-effect="non-scaling-stroke" stroke-width="0.8"/>`;label((face+jaw)/2,'#ffca81',fmt(jaw-face),275);}
  $('returnResults').innerHTML=atHome?[
- ['Sub jaw face → part cut face',fmt(cut.clearance)]
+ ['Sub jaw → Sub-held part cut face',fmt(jaw-(cut.right+shift))]
  ].map(row=>`<tr><td>${row[0]}</td><td><code>${row[1]}</code></td></tr>`).join(''):'';
  if(material&&cut){
   const feed=stage<5?0:stage===5?cutProgress:1,retract=stage<6?0:stage===6?retractProgress:1;

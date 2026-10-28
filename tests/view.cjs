@@ -26,8 +26,8 @@ const assert=require('node:assert/strict');
   assert.match(await page.locator('#view').textContent(),/Model face · 1.9750/);
   const offset=()=>page.locator('#modelPlane').evaluate(l=>(Number(l.getAttribute('x1'))-Number(document.getElementById('g54Plane').getAttribute('x1'))));
   const oldOffset=await offset();assert.ok(oldOffset<0);
-  await page.locator('#chuckDistance').fill('700');await page.getByRole('button',{name:'8. Return with material',exact:true}).click();await page.clock.runFor(2300);
-  assert.match(await page.locator('#returnResults').textContent(),/0.3820/);assert.match(await page.locator('#view').textContent(),/Model face · 1.9750/);
+  await page.locator('#cutZ').fill('.1');await page.locator('#chuckDistance').fill('700');await page.getByRole('button',{name:'8. Return with material',exact:true}).click();await page.clock.runFor(2300);
+  assert.match(await page.locator('#returnResults').textContent(),/0.2820/);assert.match(await page.locator('#view').textContent(),/Model face · 1.9750/);assert.equal(await page.locator('#subCutOut').textContent(),'0.2820″');const ends=await page.locator('#subPartDimension').evaluate(p=>({face:Number(p.dataset.face),jaw:Number(p.dataset.jaw)}));assert.ok(Math.abs(ends.jaw-ends.face-.282)<1e-9);assert.ok(Math.abs(Number(await page.locator('[data-part="piece"]').getAttribute('x'))-Number(await page.locator('#subPartCutPlane').getAttribute('x1')))<1e-9);
   await page.locator('#resetTrajectory').click();assert.equal(await page.locator('#state').textContent(),'Before grab');assert.equal(await page.locator('#progress').inputValue(),'0');assert.equal(await page.locator('#returnDistances').isVisible(),false);assert.equal(await page.locator('#cutPlane').count(),0);assert.equal(await page.locator('#zoom').inputValue(),'3');assert.equal(await page.locator('#stock').inputValue(),'2');
   assert.deepEqual(errors,[]);console.log('View checks passed: cursor-anchored zoom, thin strokes, cutting trace, next model face, jaw-to-part distance and timeline reset.');
  }finally{await browser.close();}
