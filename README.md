@@ -1,6 +1,6 @@
 # Lathe Material Transfer v1.5
 
-Portable, English-language main/sub spindle transfer visualizer. Open `web/index.html` in Edge, Chrome or Firefox, or use the GitHub Pages deployment. No build step, dependencies or Internet connection are required for the downloaded file.
+Portable, main/sub spindle transfer visualizer. Open `web/index.html` in Edge, Chrome or Firefox, or use the GitHub Pages deployment. No build step, dependencies or Internet connection are required for the downloaded file.
 
 ## Project folders
 
