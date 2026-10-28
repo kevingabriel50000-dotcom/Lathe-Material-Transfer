@@ -118,8 +118,8 @@ function draw(){
  svg+=line(0,'#aebdd1','Main jaw · 0',335)+line(g.home,'#63758e','Sub jaw at return',365);
  label(-v.mainJaw,'#9bacc3','MAIN CHUCK',40);label(jaw+v.subJaw,'#9bacc3','SUB CHUCK',40);label(jaw,'#cbd7e8','Sub jaw · '+(r?fmt(jaw-r.O):'—'),100);
  const atHome=material&&cut&&stage===returnStage&&returnTravel>=1;
- const modelFace=material&&r?r.O-v.allowance:r?r.F+d:0;
- if(r){const frontStockStart=material?modelFace:r.F;svg+=`<rect x="${x(frontStockStart)}" y="${cy-radius*scale}" width="${v.allowance*scale}" height="${2*radius*scale}" fill="none" stroke="#ffbd73" ${planeStroke}/>`+line(r.O,'#c79cff','G54 · Z0 / B0',85,'g54Plane')+line(modelFace,'#55cbb7','Model face · '+fmt(modelFace),300,'modelPlane');}
+ const modelFace=atHome?r.O-v.allowance:r?r.F+d+(separated?shift:0):0;
+ if(r){const frontStockStart=atHome?modelFace:r.F;svg+=`<rect x="${x(frontStockStart)}" y="${cy-radius*scale}" width="${v.allowance*scale}" height="${2*radius*scale}" fill="none" stroke="#ffbd73" ${planeStroke}/>`+line(r.O,'#c79cff','G54 · Z0 / B0',85,'g54Plane')+line(modelFace,'#55cbb7','Model face · '+fmt(modelFace),300,'modelPlane');}
  $('returnDistances').hidden=!atHome;
  $('subCutMetric').hidden=!separated;$('subCutOut').textContent=separated?fmt(jaw-(cut.right+shift)):'—';
  if(separated){const face=cut.right+shift,dimensionY=cy+radius*scale+18;svg+=line(face,'#ffca81','Sub-held part cut face',345,'subPartCutPlane');svg+=`<path id="subPartDimension" data-face="${face}" data-jaw="${jaw}" d="M ${x(face)} ${dimensionY-5} V ${dimensionY+5} M ${x(face)} ${dimensionY} H ${x(jaw)} M ${x(jaw)} ${dimensionY-5} V ${dimensionY+5}" fill="none" stroke="#ffca81" vector-effect="non-scaling-stroke" stroke-width="0.8"/>`;label((face+jaw)/2,'#ffca81',fmt(jaw-face),275);}
