@@ -17,7 +17,7 @@ input:disabled{opacity:.6}button:disabled{opacity:.4;cursor:default}.field-pair{
 <h2 style="margin-top:24px">Linked transfer values</h2>
 <div class="field-pair"><div><label for="grab">Grab Plane (B, in)</label><input id="grab" type="number" step="0.0001" value="0"></div><div><label for="end">Return Plane (B, in)</label><input id="end" type="number" step="0.0001" value="0"></div></div>
 <div class="field-pair"><div><label for="grip">Actual grip (in)</label><input id="grip" type="number" step="0.0001" value="0"></div><div><label for="target">Actual Protrusion (in)</label><input id="target" type="number" step="0.0001" value="0"></div></div>
-<label for="epsilon">Replace calculated Return Plane B0 with (in)</label><input id="epsilon" type="number" step="0.0001" value="0.0001">
+
 <p id="error" role="alert"></p><div class="actions"><button id="save">Save case</button><button id="reset">New case</button></div><label for="load">Open saved case</label><input id="load" type="file" accept="application/json,.json">
 </aside><div><section><h2>Fixed machine view</h2><div class="grid"><div class="metric"><small>Actual grip</small><strong id="gripOut">—</strong></div><div class="metric"><small>Pull travel</small><strong id="pullOut">—</strong></div><div class="metric"><small>Actual Protrusion</small><strong id="frontOut">—</strong></div></div>
 <label for="zoom">Main spindle zoom</label><input id="zoom" type="range" min="1" max="5" step="0.25" value="1"><label for="returnMode">Return</label><select id="returnMode"><option value="empty">Return without material</option><option value="material" disabled>Return with material</option></select><svg id="view" viewBox="0 0 1000 420" role="img" aria-label="Side view of main and sub spindle material transfer"></svg><div id="steps"></div><label for="progress">Pull travel</label><input id="progress" type="range" min="0" max="100" value="0"><button id="play">▶ Play trajectory</button><p id="state"></p><p id="message" role="status"></p><p id="notice" role="status"></p></section>
@@ -27,11 +27,11 @@ input:disabled{opacity:.6}button:disabled{opacity:.4;cursor:default}.field-pair{
 <script>
 function derive(v){
  const O=v.reference==='stock'?v.stock:v.stock-v.allowance,F=v.stock-v.allowance;
- let grab=v.grab,end=v.end,adjusted=false,requested=v.target;
- if(v.mode==='physical'){grab=F-v.grip-O;end=v.target-v.grip-O;if(Math.abs(end)<1e-9){end=v.epsilon;adjusted=Math.abs(end)>0;}}
+ let grab=v.grab,end=v.end;
+ if(v.mode==='physical'){grab=F-v.grip-O;end=v.target-v.grip-O;}
  const jaw=O+grab,grip=F-jaw,pull=end-grab,front=F+pull;
  if(![O,F,grab,end,grip,pull,front].every(Number.isFinite))throw Error('Enter valid numbers in the transfer fields.');
- return {O,F,grab,end,jaw,grip,pull,front,adjusted,requested};
+ return {O,F,grab,end,jaw,grip,pull,front};
 }
 function calculate(v){
  const r=derive(v);
@@ -50,8 +50,8 @@ function validateEnvelope(v,r,g){
  if(r.grip>v.subJaw+4.5+1e-9)throw Error('Insertion exceeds 4.5 inches behind the sub chuck face.');
  if(r.F>=g.home||r.jaw+r.pull>g.home+1e-9||r.front>g.home+v.subJaw+4.5+1e-9)throw Error('Transfer exceeds the configured return-position envelope. Check chuck distance and transfer values.');
 }
-const $=id=>document.getElementById(id),ids=['reference','stock','allowance','grip','target','epsilon','grab','end','chuckDistance','mainJaw','subJaw'];
-const defaults={reference:'stock',stock:0,allowance:0,grip:0,target:0,epsilon:.0001,grab:0,end:0,chuckDistance:600/25.4,mainJaw:1.5,subJaw:1};
+const $=id=>document.getElementById(id),ids=['reference','stock','allowance','grip','target','grab','end','chuckDistance','mainJaw','subJaw'];
+const defaults={reference:'stock',stock:0,allowance:0,grip:0,target:0,grab:0,end:0,chuckDistance:600/25.4,mainJaw:1.5,subJaw:1};
 let result,values,machine,mode='fusion',stage=0,approach=0,returnTravel=0,animation=null,revision=0;
 const key='lathe-transfer-v1.1',names=['Before grab','Sub clamps','Main opens','Pull','Main clamps','Sub opens','Return without material'];
 const fmt=n=>(Math.abs(n)<.00000001?0:n).toFixed(4)+'″',round=n=>String(Number(n.toFixed(8)));
@@ -70,7 +70,6 @@ function update(save=true){
   values=read();result=calculate(values);
   ['grip','pull','front'].forEach(k=>$(k+'Out').textContent=fmt(result[k]));
   $('results').innerHTML=[['Fixed G54 Z0 from main jaw face',fmt(result.O)],['Initial finished face / G54 Z',fmt(result.F)+' / '+fmt(result.F-result.O)],['Grab Plane (B)',fmt(result.grab)],['Return Plane (B)',fmt(result.end)],['Sub jaw face after pull',fmt(result.jaw+result.pull)],['Final finished face / G54 Z',fmt(result.front)+' / '+fmt(result.front-result.O)]].map(r=>'<tr><td>'+r[0]+'</td><td><code>'+r[1]+'</code></td></tr>').join('');
-  $('message').textContent=result.adjusted?'B0 replacement applied. Requested face: '+fmt(result.requested)+'; actual face: '+fmt(result.front)+'.':'';
  }catch(e){$('error').textContent=e.message;}
  try{machine=geometry(values);}catch(e){$('notice').textContent=e.message;}
  if(result&&machine){try{validateEnvelope(values,result,machine);$('play').disabled=false;$('save').disabled=false;}catch(e){$('error').textContent=e.message;result=null;}}

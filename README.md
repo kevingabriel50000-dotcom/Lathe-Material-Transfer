@@ -17,7 +17,7 @@ There is one transfer, with two editable representations:
 - **Actual grip + Actual Protrusion** calculate **Grab Plane + Return Plane**.
 - Editing either plane recalculates actual grip and actual protrusion.
 - Shared setup changes preserve whichever pair was edited last, identified below the fields.
-- The optional B0 substitution applies only to calculated return positions, never direct plane entries. Requested and actual protrusion are both reported if the substitution introduces a difference.
+- Calculated Return Plane zero remains zero; no postprocessor-specific correction is applied.
 
 **Stick Out/protruding** is the initial stock-front distance from the main jaw face. **Front stock** is the frontal allowance removed before grab. Selecting Model front resets Front stock to zero; the user can then override it. G54 is fixed during motion, and B0 aligns the sub jaw face with G54 Z0. Positive physical and B movement is to the right.
 
