@@ -1,4 +1,4 @@
-# Lathe Material Transfer v1.1
+# Lathe Material Transfer v1.2
 
 Portable, English-language main/sub spindle transfer visualizer. Open `index.html` in Edge, Chrome or Firefox, or use the GitHub Pages deployment. No build step, dependencies or Internet connection are required for the downloaded file.
 
@@ -14,20 +14,20 @@ A new browser starts with zero transfer inputs and prompts for setup. The last i
 
 There is one transfer, with two editable representations:
 
-- **Actual grip + Finished face protrusion** calculate **Grab Plane + Return Plane**.
-- Editing either plane recalculates actual grip and finished face protrusion.
+- **Actual grip + Actual Protrusion** calculate **Grab Plane + Return Plane**.
+- Editing either plane recalculates actual grip and actual protrusion.
 - Shared setup changes preserve whichever pair was edited last, identified below the fields.
 - The optional B0 substitution applies only to calculated return positions, never direct plane entries. Requested and actual protrusion are both reported if the substitution introduces a difference.
 
-**Stick Out/protruding** is the initial stock-front distance from the main jaw face. **Front stock** is the frontal allowance removed before grab. Model front is interpreted as the finished face after removal. G54 is fixed during motion, and B0 aligns the sub jaw face with G54 Z0. Positive physical and B movement is to the right.
+**Stick Out/protruding** is the initial stock-front distance from the main jaw face. **Front stock** is the frontal allowance removed before grab. Selecting Model front resets Front stock to zero; the user can then override it. G54 is fixed during motion, and B0 aligns the sub jaw face with G54 Z0. Positive physical and B movement is to the right.
 
 Example: Stick Out 2, Front stock 0.025, Grab Plane -1, Return Plane 0.0001 gives actual grip 0.975, pull travel 1.0001 and final finished face 2.9751 in.
 
 ## Animation and scope
 
-The sub approaches from its configured return position with smooth acceleration/deceleration before clamping. Stage controls and pull slider allow inspection. The static machine scale includes real axial jaw lengths. Basic checks reject overlap with the main jaw plane, overlong grip and motion outside the configured return-position envelope. These schematic checks do not validate a machine program or actual collision clearances.
+The sub approaches from its configured return position with smooth acceleration/deceleration before clamping. Stage controls, pull slider and a main-spindle zoom control allow inspection. The static machine scale includes real axial jaw lengths. Basic checks reject overlap with the main jaw plane, insertion more than 4.5 inches behind the sub chuck face and motion outside the configured return-position envelope. These schematic checks do not validate a machine program or actual collision clearances.
 
-Cut-off is a status stage only: its location, separated part geometry, G28 G53 return movement and G55 are not modeled yet. No G-code import, CNC output or synchronization validation is provided.
+After the main clamps, the sub opens and returns home without material; the bar remains at its final protrusion. Return with material is disabled pending cut-off modeling. Cut-off geometry and G55 remain unimplemented. No G-code import, CNC output or synchronization validation is provided.
 
 ## Validation
 

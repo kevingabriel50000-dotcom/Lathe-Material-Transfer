@@ -1,29 +1,29 @@
 <!doctype html>
-<html lang="en"><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Lathe Material Transfer v1.1</title>
+<html lang="en"><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Lathe Material Transfer v1.2</title>
 <style>
 :root{font-family:system-ui,sans-serif;color:#dce6f3;background:#0c1320}*{box-sizing:border-box}body{margin:0}header{padding:26px 5%;border-bottom:1px solid #2b3850}h1{font-size:24px;margin:0}header p{color:#95a8c1;margin:8px 0 0}.badge{font-size:13px;color:#64dfca}main{max-width:1400px;margin:auto;padding:24px;display:grid;grid-template-columns:310px 1fr;gap:22px}section,aside{background:#141e2e;border:1px solid #29384e;border-radius:14px;padding:22px}h2{font-size:17px;margin:0 0 18px}label{display:block;font-size:13px;color:#aebdd1;margin:14px 0 6px}input,select,button{font:inherit;border-radius:7px;border:1px solid #3b4e69;padding:10px;background:#0d1625;color:#ecf3fc;width:100%}button{cursor:pointer;background:#214b57}button:hover{background:#2b6270}.grid{display:grid;grid-template-columns:repeat(3,1fr);gap:12px}.metric{background:#0d1625;padding:16px;border-radius:9px}.metric small{color:#aebdd1;display:block}.metric strong{font-size:23px;display:block;margin-top:8px;color:#69e0cc}svg{width:100%;height:auto;min-height:240px}#steps{display:flex;gap:6px;flex-wrap:wrap;margin:14px 0}#steps button{width:auto;font-size:12px}#steps button.active{background:#55cbb7;color:#081e22}#message{color:#ffca81;min-height:24px}p,li{line-height:1.6}.muted{color:#9bacc3;font-size:13px}table{width:100%;border-collapse:collapse;font-size:14px}td,th{text-align:left;padding:12px 6px;border-bottom:1px solid #29384e}code{color:#79d9ff}#error{color:#ff9d9d}details{margin-top:20px}summary{cursor:pointer}footer{margin-top:18px}.actions{display:flex;gap:10px;margin-top:16px}@media(max-width:850px){main{grid-template-columns:1fr}.grid{grid-template-columns:1fr}}
 
 input:disabled{opacity:.6}button:disabled{opacity:.4;cursor:default}.field-pair{display:grid;grid-template-columns:1fr 1fr;gap:10px}#view{min-height:320px} .pill{color:#79d9ff;font-size:12px} #notice{color:#ffca81} [hidden]{display:none!important}
 </style>
-<header><h1>Lathe Material Transfer <span class="badge">v1.1</span></h1><p>Fusion planes ↔ physical material movement · inches</p></header>
+<header><h1>Lathe Material Transfer <span class="badge">v1.2</span></h1><p>Fusion planes ↔ physical material movement · inches</p></header>
 <main><aside><h2>Machine geometry</h2>
 <label for="chuckDistance">Chuck face-to-face distance at sub return (in)</label><input id="chuckDistance" type="number" min="0" step="0.0001" placeholder="Required — measure your machine">
-<p class="muted">Lynx 2100LSY: user-provided default 600 mm (23.6220 in), between chuck faces without jaws, with the sub at return. Editable to match your machine. This sets the fixed drawing scale; it is not constant during sub movement.</p>
+
 <div class="field-pair"><div><label for="mainJaw">Main jaw length (in)</label><input id="mainJaw" type="number" min="0" step="0.0001" value="1.5"></div><div><label for="subJaw">Sub jaw length (in)</label><input id="subJaw" type="number" min="0" step="0.0001" value="1"></div></div>
 <h2 style="margin-top:24px">Transfer setup</h2><label for="reference">G54 Z0 / Feed plane B0 reference</label><select id="reference"><option value="stock">Stock front</option><option value="model">Model front</option></select>
 <label for="stock">Stick Out/protruding (in)</label><input id="stock" type="number" step="0.0001" value="0">
 <label for="allowance">Front stock (in)</label><input id="allowance" type="number" min="0" step="0.0001" value="0">
-<p class="muted">Stick Out is measured from the main jaw face to the original stock front. Front stock is the axial allowance removed before grab.</p>
-<h2 style="margin-top:24px">Linked transfer values</h2><p class="muted">Edit either pair. The other pair updates automatically. Shared setup changes preserve the last pair you edited.</p>
-<div class="field-pair"><div><label for="grip">Actual grip (in)</label><input id="grip" type="number" step="0.0001" value="0"></div><div><label for="target">Finished face protrusion (in)</label><input id="target" type="number" step="0.0001" value="0"></div></div>
+
+<h2 style="margin-top:24px">Linked transfer values</h2>
 <div class="field-pair"><div><label for="grab">Grab Plane (B, in)</label><input id="grab" type="number" step="0.0001" value="0"></div><div><label for="end">Return Plane (B, in)</label><input id="end" type="number" step="0.0001" value="0"></div></div>
-<p id="driver" class="pill"></p><label for="epsilon">Replace calculated Return Plane B0 with (in)</label><input id="epsilon" type="number" step="0.0001" value="0.0001"><p class="muted">Applies only when editing physical values and the calculated return is zero. Direct plane entries remain exact.</p>
-<p id="error" role="alert"></p><div class="actions"><button id="save">Save case</button><button id="reset">New case</button></div><label for="load">Open saved case</label><input id="load" type="file" accept="application/json,.json"><p id="storage" class="muted"></p>
-</aside><div><section><h2>Fixed machine view</h2><div class="grid"><div class="metric"><small>Actual grip</small><strong id="gripOut">—</strong></div><div class="metric"><small>Pull travel</small><strong id="pullOut">—</strong></div><div class="metric"><small>Finished face protrusion</small><strong id="frontOut">—</strong></div></div>
-<svg id="view" viewBox="0 0 1000 420" role="img" aria-label="Side view of main and sub spindle material transfer"></svg><div id="steps"></div><label for="progress">Pull travel</label><input id="progress" type="range" min="0" max="100" value="0"><button id="play">▶ Play trajectory</button><p id="state"></p><p id="message" role="status"></p><p id="notice" role="status"></p><p class="muted">Cyan: current material · orange: removed front stock at its original location · purple: fixed G54 · gray: chuck bodies and jaws. Physical positions increase to the right from the main jaw face.</p></section>
+<div class="field-pair"><div><label for="grip">Actual grip (in)</label><input id="grip" type="number" step="0.0001" value="0"></div><div><label for="target">Actual Protrusion (in)</label><input id="target" type="number" step="0.0001" value="0"></div></div>
+<label for="epsilon">Replace calculated Return Plane B0 with (in)</label><input id="epsilon" type="number" step="0.0001" value="0.0001">
+<p id="error" role="alert"></p><div class="actions"><button id="save">Save case</button><button id="reset">New case</button></div><label for="load">Open saved case</label><input id="load" type="file" accept="application/json,.json">
+</aside><div><section><h2>Fixed machine view</h2><div class="grid"><div class="metric"><small>Actual grip</small><strong id="gripOut">—</strong></div><div class="metric"><small>Pull travel</small><strong id="pullOut">—</strong></div><div class="metric"><small>Actual Protrusion</small><strong id="frontOut">—</strong></div></div>
+<label for="zoom">Main spindle zoom</label><input id="zoom" type="range" min="1" max="5" step="0.25" value="1"><label for="returnMode">Return</label><select id="returnMode"><option value="empty">Return without material</option><option value="material" disabled>Return with material</option></select><svg id="view" viewBox="0 0 1000 420" role="img" aria-label="Side view of main and sub spindle material transfer"></svg><div id="steps"></div><label for="progress">Pull travel</label><input id="progress" type="range" min="0" max="100" value="0"><button id="play">▶ Play trajectory</button><p id="state"></p><p id="message" role="status"></p><p id="notice" role="status"></p></section>
 <section style="margin-top:20px"><h2>Positions and references</h2><table><thead><tr><th>Quantity</th><th>Value</th></tr></thead><tbody id="results"></tbody></table>
-<details><summary>Calculation and scope</summary><p>Origin O = Stick Out for Stock front; O = Stick Out − Front stock for Model front. Initial finished face F = Stick Out − Front stock. Sub jaw face at grab J = O + Grab Plane. Actual grip = F − J. Pull = Return Plane − Grab Plane. Final finished face = F + Pull.</p><p>From physical values: Grab Plane = F − grip − O; Return Plane = requested protrusion − grip − O. Both pairs describe the same transfer. A zero-return replacement is shown explicitly; it can make the actual result differ from the requested value.</p><p>The main chuck face is at −main jaw length. At machine return the sub jaw face is at chuck distance − main jaw length − sub jaw length. This geometry fixes the scale and limits the supported range. B0 still places the sub jaw face at G54 Z0, not machine home.</p></details>
-<footer class="muted">v1.1 scope: grab → pull with uncut bar → main closes → cut-off status. No cut-off location, detached part length, G28 G53 return movement or G55 calculation yet. No CNC output or machine collision/synchronization validation. The schematic clearance checks are not a machine safety assessment. G-code import is not implemented.</footer></section></div></main>
+
+</section></div></main>
 <script>
 function derive(v){
  const O=v.reference==='stock'?v.stock:v.stock-v.allowance,F=v.stock-v.allowance;
@@ -47,23 +47,22 @@ function geometry(v){
  return {home,scale:800/(v.chuckDistance+2),left:-v.mainJaw-1};
 }
 function validateEnvelope(v,r,g){
- if(r.grip>v.subJaw+1e-9)throw Error('Actual grip exceeds the modeled sub jaw length. Through-chuck insertion is not modeled yet.');
- if(r.F>=g.home||r.jaw+r.pull>g.home+1e-9||r.front>g.home+v.subJaw+1e-9)throw Error('Transfer exceeds the configured return-position envelope. Check chuck distance and transfer values.');
+ if(r.grip>v.subJaw+4.5+1e-9)throw Error('Insertion exceeds 4.5 inches behind the sub chuck face.');
+ if(r.F>=g.home||r.jaw+r.pull>g.home+1e-9||r.front>g.home+v.subJaw+4.5+1e-9)throw Error('Transfer exceeds the configured return-position envelope. Check chuck distance and transfer values.');
 }
 const $=id=>document.getElementById(id),ids=['reference','stock','allowance','grip','target','epsilon','grab','end','chuckDistance','mainJaw','subJaw'];
 const defaults={reference:'stock',stock:0,allowance:0,grip:0,target:0,epsilon:.0001,grab:0,end:0,chuckDistance:600/25.4,mainJaw:1.5,subJaw:1};
-let result,values,machine,mode='fusion',stage=0,approach=0,animation=null,revision=0;
-const key='lathe-transfer-v1.1',names=['Before grab','Sub clamps','Main opens','Pull','Main clamps','After cut-off'];
+let result,values,machine,mode='fusion',stage=0,approach=0,returnTravel=0,animation=null,revision=0;
+const key='lathe-transfer-v1.1',names=['Before grab','Sub clamps','Main opens','Pull','Main clamps','Sub opens','Return without material'];
 const fmt=n=>(Math.abs(n)<.00000001?0:n).toFixed(4)+'″',round=n=>String(Number(n.toFixed(8)));
 function read(){return {...Object.fromEntries(ids.map(id=>[id,id==='reference'?$(id).value:$(id).value.trim()===''?NaN:Number($(id).value)])),mode};}
 function setFields(v){ids.forEach(id=>$(id).value=v[id]??'');}
 function stop(){revision++;if(animation)cancelAnimationFrame(animation);animation=null;$('play').textContent='▶ Play trajectory';}
-function persist(){try{localStorage.setItem(key,JSON.stringify({version:'1.1',parameters:read()}));$('storage').textContent='Inputs are remembered in this browser. Save a case to keep a separate copy.';}catch(e){$('storage').textContent='Browser storage is unavailable. Use Save case to keep your inputs.';}}
+function persist(){try{localStorage.setItem(key,JSON.stringify({version:'1.2',parameters:read()}));}catch(e){}}
 function update(save=true){
- stop();stage=0;approach=0;$('progress').value=0;values=read();result=null;machine=null;
+ stop();stage=0;approach=0;returnTravel=0;$('progress').value=0;values=read();result=null;machine=null;
  $('error').textContent='';$('notice').textContent='';$('message').textContent='';$('results').innerHTML='';$('play').disabled=true;$('save').disabled=true;
  ['grip','pull','front'].forEach(k=>$(k+'Out').textContent='—');
- $('driver').textContent=mode==='physical'?'Driving values: actual grip + finished face protrusion':'Driving values: Grab Plane + Return Plane';
  try{
   const r=derive(values);
   if(mode==='physical'){ $('grab').value=round(r.grab);$('end').value=round(r.end); }
@@ -80,35 +79,37 @@ function update(save=true){
 function draw(){
  const r=result,g=machine,v=values;
  if(!g){$('view').innerHTML='<text x="50" y="180" fill="#aebdd1" font-size="20">Enter machine geometry to establish a fixed scale.</text>';$('state').textContent='Waiting for machine geometry.';return;}
- const x=n=>70+(n-g.left)*g.scale,yTop=155,yBottom=235;
+ const scale=g.scale*Number($('zoom').value),x=n=>70+(n-g.left)*scale;
  const p=stage<3?0:stage===3?Number($('progress').value)/100:1,d=r?r.pull*p:0;
  const smooth=approach*approach*(3-2*approach);
- const jaw=r?(stage<2?g.home+(r.jaw-g.home)*smooth:r.jaw+d):g.home;
- const mainOpen=stage===2||stage===3,subOpen=stage===0||(stage===1&&approach<1);
- const rect=(a,w,y,h,fill)=>`<rect x="${x(a)}" y="${y}" width="${w*g.scale}" height="${h}" fill="${fill}" rx="3"/>`;
+ const returnEase=returnTravel*returnTravel*(3-2*returnTravel);
+ const jaw=r?(stage<2?g.home+(r.jaw-g.home)*smooth:stage===6?r.jaw+r.pull+(g.home-r.jaw-r.pull)*returnEase:r.jaw+d):g.home;
+ const mainOpen=stage===2||stage===3,subOpen=stage>=5||stage===0||(stage===1&&approach<1);
+ const rect=(a,w,y,h,fill)=>`<rect x="${x(a)}" y="${y}" width="${w*scale}" height="${h}" fill="${fill}" rx="3"/>`;
  const line=(pos,color,label,y)=>`<line x1="${x(pos)}" x2="${x(pos)}" y1="90" y2="320" stroke="${color}" stroke-dasharray="5 5"/><text x="${x(pos)+4}" y="${y}" fill="${color}" font-size="13">${label}</text>`;
  let svg=`<line x1="35" x2="970" y1="195" y2="195" stroke="#506078" stroke-dasharray="6 5"/>`;
  if(r)svg+=rect(g.left,r.F+d-g.left,169,52,'#55cbb7');
  svg+=rect(-v.mainJaw-.65,.65,115,160,'#445873');
  svg+=rect(-v.mainJaw,v.mainJaw,mainOpen?120:135,34,'#8796ac')+rect(-v.mainJaw,v.mainJaw,mainOpen?236:221,34,'#8796ac');
- svg+=rect(jaw+v.subJaw,.65,115,160,'#445873');
+ svg+=rect(jaw+v.subJaw,.65,115,54,'#445873')+rect(jaw+v.subJaw,.65,221,54,'#445873');
  svg+=rect(jaw,v.subJaw,subOpen?120:135,34,'#8796ac')+rect(jaw,v.subJaw,subOpen?236:221,34,'#8796ac');
  svg+=line(0,'#aebdd1','Main jaw · 0',335)+line(g.home,'#63758e','Sub jaw at return',365);
- svg+=`<text x="${x(-v.mainJaw)}" y="65" fill="#9bacc3" font-size="13">MAIN CHUCK</text><text x="${x(jaw+v.subJaw)-30}" y="65" fill="#9bacc3" font-size="13">SUB CHUCK</text><text x="${x(jaw)}" y="100" fill="#cbd7e8" font-size="13">Sub jaw · ${fmt(jaw)}</text><text x="70" y="400" fill="#9bacc3" font-size="13">Fixed return-position chuck distance: ${fmt(v.chuckDistance)} · main jaws ${fmt(v.mainJaw)} · sub jaws ${fmt(v.subJaw)}</text>`;
- if(r){svg+=`<rect x="${x(r.F)}" y="169" width="${v.allowance*g.scale}" height="52" fill="none" stroke="#ffbd73" stroke-dasharray="3 3"/>`+line(r.O,'#c79cff','G54 · Z0 / B0',85)+line(r.F+d,'#55cbb7','Face · '+fmt(r.F+d),300);}
+ svg+=`<text x="${x(-v.mainJaw)}" y="65" fill="#9bacc3" font-size="13">MAIN CHUCK</text><text x="${x(jaw+v.subJaw)-30}" y="65" fill="#9bacc3" font-size="13">SUB CHUCK</text><text x="${x(jaw)}" y="100" fill="#cbd7e8" font-size="13">Sub jaw · ${fmt(jaw)}</text>`;
+ if(r){svg+=`<rect x="${x(r.F)}" y="169" width="${v.allowance*scale}" height="52" fill="none" stroke="#ffbd73" stroke-dasharray="3 3"/>`+line(r.O,'#c79cff','G54 · Z0 / B0',85)+line(r.F+d,'#55cbb7','Face · '+fmt(r.F+d),300);}
  $('view').innerHTML=svg;
- $('state').textContent=r?names[stage]+(stage===1?' · approach '+Math.round(approach*100)+'%':stage===3?' · '+Math.round(p*100)+'%':'')+' — '+['Main closed; sub open at return position.','Sub approaches smoothly, then clamps.','Sub closed; main open.','Bar and sub move together.','Both chucks closed; ready for cut-off.','Cut-off status only. Cut location and separated part geometry are not modeled.'][stage]:'Enter valid transfer values to start.';
+ $('state').textContent=r?names[stage]+(stage===1?' · '+Math.round(approach*100)+'%':stage===3?' · '+Math.round(p*100)+'%':stage===6?' · '+Math.round(returnTravel*100)+'%':''):'';
  [...$('steps').children].forEach((b,i)=>{b.classList.toggle('active',i===stage);b.disabled=!r;});$('progress').disabled=!r;
 }
 function move(duration,callback,done){const token=revision,start=performance.now();function frame(now){if(token!==revision)return;const t=Math.min(1,(now-start)/duration);callback(t);draw();if(t<1)animation=requestAnimationFrame(frame);else{animation=null;done();}}animation=requestAnimationFrame(frame);}
-function selectStage(i){stop();if(!result||!machine)return;stage=i;$('progress').value=i>3?100:0;if(i===0||i===1){const from=approach,to=i===1?1:0;move(1600,t=>approach=from+(to-from)*t,()=>draw());}else{approach=1;draw();}}
+function selectStage(i){stop();if(!result||!machine)return;stage=i;returnTravel=0;$('progress').value=i>3?100:0;if(i===0||i===1){const from=approach,to=i===1?1:0;move(1600,t=>approach=from+(to-from)*t,()=>draw());}else{approach=1;if(i===6)move(2200,t=>returnTravel=t,()=>draw());else draw();}}
 names.forEach((name,i)=>{const b=document.createElement('button');b.textContent=(i+1)+'. '+name;b.onclick=()=>selectStage(i);$('steps').append(b);});
-ids.forEach(id=>$(id).addEventListener('input',()=>{if(['grip','target'].includes(id))mode='physical';if(['grab','end'].includes(id))mode='fusion';update();}));
+ids.forEach(id=>$(id).addEventListener('input',()=>{if(id==='reference'&&$('reference').value==='model')$('allowance').value=0;if(['grip','target'].includes(id))mode='physical';if(['grab','end'].includes(id))mode='fusion';update();}));
+$('zoom').oninput=()=>draw();
 $('progress').oninput=()=>{stop();stage=3;approach=1;draw();};
-$('play').onclick=()=>{if(animation){stop();return;}stop();if(!result||!machine)return;stage=0;approach=0;$('progress').value=0;$('play').textContent='❚❚ Pause';draw();const next=()=>{if(stage>=5){stop();return;}stage++;if(stage===1)move(2200,t=>approach=t,next);else if(stage===3)move(3200,t=>$('progress').value=t*100,next);else move(800,()=>{},next);};move(600,()=>{},next);};
-$('save').onclick=()=>{if(!result||!machine)return;const a=document.createElement('a'),url=URL.createObjectURL(new Blob([JSON.stringify({version:'1.1',parameters:read()},null,2)],{type:'application/json'}));a.href=url;a.download='lathe-transfer-v1.1.json';a.click();setTimeout(()=>URL.revokeObjectURL(url),1000);};
-function parseCase(data){if(!['1.0','1.1'].includes(data.version)||!data.parameters)throw Error('Unsupported case format.');const v={...defaults,...data.parameters};if(!['stock','model'].includes(v.reference)||!['physical','fusion'].includes(v.mode)||ids.some(id=>id!=='reference'&&!(id==='chuckDistance'&&v[id]===null)&&(!Number.isFinite(v[id]))))throw Error('Invalid case parameters.');calculate(v);return v;}
+$('play').onclick=()=>{if(animation){stop();return;}stop();if(!result||!machine)return;stage=0;approach=0;$('progress').value=0;$('play').textContent='❚❚ Pause';draw();const next=()=>{if(stage>=6){stop();return;}stage++;if(stage===1)move(2200,t=>approach=t,next);else if(stage===3)move(3200,t=>$('progress').value=t*100,next);else if(stage===6)move(2200,t=>returnTravel=t,()=>stop());else move(800,()=>{},next);};move(600,()=>{},next);};
+$('save').onclick=()=>{if(!result||!machine)return;const a=document.createElement('a'),url=URL.createObjectURL(new Blob([JSON.stringify({version:'1.2',parameters:read()},null,2)],{type:'application/json'}));a.href=url;a.download='lathe-transfer-v1.2.json';a.click();setTimeout(()=>URL.revokeObjectURL(url),1000);};
+function parseCase(data){if(!['1.0','1.1','1.2'].includes(data.version)||!data.parameters)throw Error('Unsupported case format.');const v={...defaults,...data.parameters};if(!['stock','model'].includes(v.reference)||!['physical','fusion'].includes(v.mode)||ids.some(id=>id!=='reference'&&!(id==='chuckDistance'&&v[id]===null)&&(!Number.isFinite(v[id]))))throw Error('Invalid case parameters.');calculate(v);return v;}
 $('load').onchange=async e=>{try{const v=parseCase(JSON.parse(await e.target.files[0].text()));mode=v.mode;setFields(v);update();if(!Number.isFinite(v.chuckDistance))$('notice').textContent='Case loaded. Enter chuck distance to enable the fixed-scale simulation.';}catch(e){$('error').textContent=e.message;}finally{$('load').value='';}};
 $('reset').onclick=()=>{const current=read();mode='fusion';setFields({...defaults,chuckDistance:Number.isFinite(current.chuckDistance)?current.chuckDistance:null,mainJaw:current.mainJaw,subJaw:current.subJaw});update();};
-setFields(defaults);try{const saved=JSON.parse(localStorage.getItem(key));if(saved&&saved.version==='1.1'){const v=saved.parameters;if(v&&['stock','model'].includes(v.reference)&&['fusion','physical'].includes(v.mode)){setFields({...defaults,...v,chuckDistance:v.chuckDistance??defaults.chuckDistance});mode=v.mode;}}}catch(e){}update();
+setFields(defaults);try{const saved=JSON.parse(localStorage.getItem(key));if(saved&&['1.1','1.2'].includes(saved.version)){const v=saved.parameters;if(v&&['stock','model'].includes(v.reference)&&['fusion','physical'].includes(v.mode)){setFields({...defaults,...v,chuckDistance:v.chuckDistance??defaults.chuckDistance});mode=v.mode;}}}catch(e){}update();
 </script></html>
