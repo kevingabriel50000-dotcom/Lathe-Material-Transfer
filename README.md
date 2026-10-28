@@ -37,4 +37,4 @@ The displayed axial clearance checks the insert against the sub jaw face, not th
 
 ## Base version
 
-The Git tag `v1.3` preserves the approved base program. Future changes must not move or replace this tag.
+The Git tag `v1.5` preserves the current approved base program. The earlier `v1.3` base is retained separately. Future changes must not move or replace either tag.
