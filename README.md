@@ -4,7 +4,7 @@ Portable, English-language main/sub spindle transfer visualizer. Open `index.htm
 
 ## Setup
 
-Enter the **chuck face-to-face distance with the sub at its machine return position**, excluding jaws. This distance establishes a fixed view scale; changing transfer planes does not rescale the machine or move the fixed G54 origin. The sub chuck moves during the transfer, so instantaneous chuck separation changes.
+Enter **Face-to-face chucks machine distance** in millimeters with the sub at its machine return position, excluding jaws. Transfer and jaw dimensions remain in inches; case files retain the internal inch distance for backward compatibility. This distance establishes a fixed view scale; changing transfer planes does not rescale the machine or move the fixed G54 origin. The sub chuck moves during the transfer, so instantaneous chuck separation changes.
 
 Main jaw length defaults to **1.5 in**, sub jaw length to **1.0 in**, both editable. Chuck distance defaults to **600 mm (600/25.4 = 23.622047244… in)**, supplied by the user for the Lynx 2100LSY, not independently verified against manufacturer documentation. The application retains the conversion precision. Existing saved nonempty geometry is preserved; a previously blank browser distance is filled with this default. Do not substitute between-centers distance, turning length or axis travel for chuck-face distance.
 
@@ -25,7 +25,7 @@ Example: Stick Out 2, Front stock 0.025, Grab Plane -1, Return Plane 0.0001 give
 
 ## Animation and scope
 
-The sub approaches from its configured return position with smooth acceleration/deceleration before clamping. Stage controls, pull slider and a main-spindle zoom control allow inspection. The static machine scale includes real axial jaw lengths. Basic checks reject overlap with the main jaw plane, insertion more than 4.5 inches behind the sub chuck face and motion outside the configured return-position envelope. These schematic checks do not validate a machine program or actual collision clearances.
+The sub approaches from its configured return position with smooth acceleration/deceleration before clamping. Stage controls, pull slider and a main-spindle zoom control allow inspection. Playback can pause and continue at the same point, including during the 600 ms hold between stages. The sub jaw position label is measured from G54 B0; Model face remains a protrusion measured from the main jaw face. The static machine scale includes real axial jaw lengths. Basic checks reject overlap with the main jaw plane, insertion more than 4.5 inches behind the sub chuck face and motion outside the configured return-position envelope. These schematic checks do not validate a machine program or actual collision clearances.
 
 After the main clamps, the sub opens and returns home without material; the bar remains at its final protrusion. Return with material is disabled pending cut-off modeling. Cut-off geometry and G55 remain unimplemented. No G-code import, CNC output or synchronization validation is provided.
 
