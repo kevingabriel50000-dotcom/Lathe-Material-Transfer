@@ -1,4 +1,4 @@
-# Lathe Material Transfer v1.3
+# Lathe Material Transfer v1.4
 
 Portable, English-language main/sub spindle transfer visualizer. Open `index.html` in Edge, Chrome or Firefox, or use the GitHub Pages deployment. No build step, dependencies or Internet connection are required for the downloaded file.
 
@@ -25,9 +25,11 @@ Example: Stick Out 2, Front stock 0.025, Grab Plane -1, Return Plane 0.0001 give
 
 ## Animation and scope
 
-The sub approaches from its configured return position with smooth acceleration/deceleration before clamping. Stage controls, pull slider and a main-spindle zoom control allow inspection. Playback can pause and continue at the same point, including during the 600 ms hold between stages. The sub jaw position label is measured from G54 B0; Model face remains a protrusion measured from the main jaw face. The static machine scale includes real axial jaw lengths. Basic checks reject overlap with the main jaw plane, insertion more than 4.5 inches behind the sub chuck face and motion outside the configured return-position envelope. These schematic checks do not validate a machine program or actual collision clearances.
+The sub approaches from its configured return position with smooth acceleration/deceleration before clamping. Zoom applies a uniform scale to both axes. Stage controls, pull slider and a main-spindle zoom control allow inspection. Playback can pause and continue at the same point, including during the 600 ms hold between stages. The sub jaw position label is measured from G54 B0; Model face remains a protrusion measured from the main jaw face. The static machine scale includes real axial jaw lengths. Basic checks reject overlap with the main jaw plane, insertion more than 4.5 inches behind the sub chuck face and motion outside the configured return-position envelope. These schematic checks do not validate a machine program or actual collision clearances.
 
-After the main clamps, the sub opens and returns home without material; the bar remains at its final protrusion. Return with material is disabled pending cut-off modeling. Cut-off geometry and G55 remain unimplemented. No G-code import, CNC output or synchronization validation is provided.
+After the main clamps, **Return without material** opens the sub jaws and returns home while the bar stays in place. **Return with material** performs cut-off, retracts the insert, and returns with the separated part held in the sub jaws. Cut-off Z defaults to G54 Z0 and bar diameter to 1 inch. The generic square insert defaults to width 0.118, corner radius 0.011 and length 0.4 inches, all editable. Its programmed point is the virtual lower-left corner; the insert extends toward positive Z. The radial feed reaches the spindle centerline plus corner-radius overtravel (theoretical point X = −2 × radius in diameter programming). The kerf is swept symmetrically as the bar rotates. The kerf occupies [cut Z, cut Z + width].
+
+The displayed axial clearance checks the insert against the sub jaw face, not the holder or turret. Nonpositive insert clearance blocks playback. G55, G-code import, CNC output and synchronization validation remain unimplemented.
 
 ## Validation
 

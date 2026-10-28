@@ -27,3 +27,13 @@ for(const reference of ['stock','model']){
  near(planes.grip,1);near(planes.front,3);near(planes.O,physical.O);
 }
 console.log('Geometry, fixed scale, envelope and bidirectional calculation checks passed.');
+
+const cutInput={...machine,returnMode:'material',cutZ:0,diameter:1,toolWidth:.118,toolRadius:.011,toolLength:.4,end:.5};
+const cutResult=ctx.calculate(cutInput),cut=ctx.cutGeometry(cutInput,cutResult);
+near(cut.left,2);near(cut.right,2.118);near(cut.clearance,.382);near(cut.partLength,1.357);
+assert.throws(()=>ctx.cutGeometry({...cutInput,end:0},ctx.calculate({...cutInput,end:0})));
+assert.throws(()=>ctx.cutGeometry({...cutInput,cutZ:-2},cutResult));
+assert.throws(()=>ctx.cutGeometry({...cutInput,cutZ:5},cutResult));
+assert.throws(()=>ctx.cutGeometry({...cutInput,toolRadius:.1},cutResult));
+assert.throws(()=>ctx.cutGeometry({...cutInput,diameter:0},cutResult));
+console.log('Cut-off kerf, part length, insert-to-jaw clearance and validation checks passed.');

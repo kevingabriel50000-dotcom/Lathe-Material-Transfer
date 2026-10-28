@@ -1,11 +1,11 @@
 <!doctype html>
-<html lang="en"><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Lathe Material Transfer v1.3</title>
+<html lang="en"><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Lathe Material Transfer v1.4</title>
 <style>
 :root{font-family:system-ui,sans-serif;color:#dce6f3;background:#0c1320}*{box-sizing:border-box}body{margin:0}header{padding:26px 5%;border-bottom:1px solid #2b3850}h1{font-size:24px;margin:0}header p{color:#95a8c1;margin:8px 0 0}.badge{font-size:13px;color:#64dfca}main{max-width:1400px;margin:auto;padding:24px;display:grid;grid-template-columns:310px 1fr;gap:22px}section,aside{background:#141e2e;border:1px solid #29384e;border-radius:14px;padding:22px}h2{font-size:17px;margin:0 0 18px}label{display:block;font-size:13px;color:#aebdd1;margin:14px 0 6px}input,select,button{font:inherit;border-radius:7px;border:1px solid #3b4e69;padding:10px;background:#0d1625;color:#ecf3fc;width:100%}button{cursor:pointer;background:#214b57}button:hover{background:#2b6270}.grid{display:grid;grid-template-columns:repeat(3,1fr);gap:12px}.metric{background:#0d1625;padding:16px;border-radius:9px}.metric small{color:#aebdd1;display:block}.metric strong{font-size:23px;display:block;margin-top:8px;color:#69e0cc}svg{width:100%;height:auto;min-height:240px}#steps{display:flex;gap:6px;flex-wrap:wrap;margin:14px 0}#steps button{width:auto;font-size:12px}#steps button.active{background:#55cbb7;color:#081e22}#message{color:#ffca81;min-height:24px}p,li{line-height:1.6}.muted{color:#9bacc3;font-size:13px}table{width:100%;border-collapse:collapse;font-size:14px}td,th{text-align:left;padding:12px 6px;border-bottom:1px solid #29384e}code{color:#79d9ff}#error{color:#ff9d9d}details{margin-top:20px}summary{cursor:pointer}footer{margin-top:18px}.actions{display:flex;gap:10px;margin-top:16px}@media(max-width:850px){main{grid-template-columns:1fr}.grid{grid-template-columns:1fr}}
 
 input:disabled{opacity:.6}button:disabled{opacity:.4;cursor:default}.field-pair{display:grid;grid-template-columns:1fr 1fr;gap:10px}#view{min-height:320px} .pill{color:#79d9ff;font-size:12px} #notice{color:#ffca81} [hidden]{display:none!important}
 </style>
-<header><h1>Lathe Material Transfer <span class="badge">v1.3</span></h1><p>Fusion planes ↔ physical material movement · inches</p></header>
+<header><h1>Lathe Material Transfer <span class="badge">v1.4</span></h1><p>Fusion planes ↔ physical material movement · inches</p></header>
 <main><aside><h2>Machine geometry</h2>
 <label for="chuckDistance">Face-to-face chucks machine distance (mm)</label><input id="chuckDistance" type="number" min="0" step="0.001" placeholder="Required — measure your machine">
 
@@ -18,9 +18,9 @@ input:disabled{opacity:.6}button:disabled{opacity:.4;cursor:default}.field-pair{
 <div class="field-pair"><div><label for="grab">Grab Plane (B, in)</label><input id="grab" type="number" step="0.0001" value="0"></div><div><label for="end">Return Plane (B, in)</label><input id="end" type="number" step="0.0001" value="0"></div></div>
 <div class="field-pair"><div><label for="grip">Actual grip (in)</label><input id="grip" type="number" step="0.0001" value="0"></div><div><label for="target">Actual Protrusion (in)</label><input id="target" type="number" step="0.0001" value="0"></div></div>
 
-<p id="error" role="alert"></p><div class="actions"><button id="save">Save case</button><button id="reset">New case</button></div><label for="load">Open saved case</label><input id="load" type="file" accept="application/json,.json">
+<div id="cutFields" hidden><h2 style="margin-top:24px">Cut-off</h2><label for="cutZ">Cut-off plane (G54 Z, in)</label><input id="cutZ" type="number" step="0.0001" value="0"><label for="diameter">Bar diameter at cut (in)</label><input id="diameter" type="number" min="0" step="0.0001" value="1"><div class="field-pair"><div><label for="toolWidth">Insert width (in)</label><input id="toolWidth" type="number" min="0" step="0.0001" value="0.118"></div><div><label for="toolRadius">Corner radius (in)</label><input id="toolRadius" type="number" min="0" step="0.0001" value="0.011"></div></div><label for="toolLength">Insert length (in)</label><input id="toolLength" type="number" min="0" step="0.0001" value="0.4"></div><p id="error" role="alert"></p><div class="actions"><button id="save">Save case</button><button id="reset">New case</button></div><label for="load">Open saved case</label><input id="load" type="file" accept="application/json,.json">
 </aside><div><section><h2>Fixed machine view</h2><div class="grid"><div class="metric"><small>Actual grip</small><strong id="gripOut">—</strong></div><div class="metric"><small>Pull travel</small><strong id="pullOut">—</strong></div><div class="metric"><small>Actual Protrusion</small><strong id="frontOut">—</strong></div></div>
-<label for="zoom">Main spindle zoom</label><input id="zoom" type="range" min="1" max="5" step="0.25" value="1"><label for="returnMode">Return</label><select id="returnMode"><option value="empty">Return without material</option><option value="material" disabled>Return with material</option></select><svg id="view" viewBox="0 0 1000 420" role="img" aria-label="Side view of main and sub spindle material transfer"></svg><div id="steps"></div><label for="progress">Pull travel</label><input id="progress" type="range" min="0" max="100" value="0"><button id="play">▶ Play trajectory</button><p id="state"></p><p id="message" role="status"></p><p id="notice" role="status"></p></section>
+<label for="zoom">Main spindle zoom</label><input id="zoom" type="range" min="1" max="5" step="0.25" value="1"><label for="returnMode">Return</label><select id="returnMode"><option value="empty">Return without material</option><option value="material">Return with material</option></select><svg id="view" viewBox="0 0 1000 420" role="img" aria-label="Side view of main and sub spindle material transfer"></svg><div id="steps"></div><label for="progress">Pull travel</label><input id="progress" type="range" min="0" max="100" value="0"><button id="play">▶ Play trajectory</button><p id="state"></p><p id="message" role="status"></p><p id="notice" role="status"></p></section>
 <section style="margin-top:20px"><h2>Positions and references</h2><table><thead><tr><th>Quantity</th><th>Value</th></tr></thead><tbody id="results"></tbody></table>
 
 </section></div></main>
@@ -50,20 +50,32 @@ function validateEnvelope(v,r,g){
  if(r.grip>v.subJaw+4.5+1e-9)throw Error('Insertion exceeds 4.5 inches behind the sub chuck face.');
  if(r.F>=g.home||r.jaw+r.pull>g.home+1e-9||r.front>g.home+v.subJaw+4.5+1e-9)throw Error('Transfer exceeds the configured return-position envelope. Check chuck distance and transfer values.');
 }
-const $=id=>document.getElementById(id),ids=['reference','stock','allowance','grip','target','grab','end','chuckDistance','mainJaw','subJaw'];
-const defaults={reference:'stock',stock:0,allowance:0,grip:0,target:0,grab:0,end:0,chuckDistance:600/25.4,mainJaw:1.5,subJaw:1};
+function cutGeometry(v,r){
+ if(![v.cutZ,v.diameter,v.toolWidth,v.toolRadius,v.toolLength].every(Number.isFinite)||v.diameter<=0||v.toolWidth<=0||v.toolRadius<0||v.toolLength<=0)throw Error('Enter a positive bar diameter and valid insert dimensions.');
+ if(v.toolRadius*2>Math.min(v.toolWidth,v.toolLength))throw Error('Corner radius exceeds the insert dimensions.');
+ const left=r.O+v.cutZ,right=left+v.toolWidth,jaw=r.jaw+r.pull,clearance=jaw-right;
+ if(left<=0)throw Error('Cut-off insert reaches the main jaw face.');
+ if(right>=r.front)throw Error('Cut-off plane leaves no separated part.');
+ if(clearance<=0)throw Error('Cut-off insert overlaps or touches the sub jaws.');
+ return {left,right,clearance,partLength:r.front-right};
+}
+const $=id=>document.getElementById(id),ids=['reference','stock','allowance','grip','target','grab','end','chuckDistance','mainJaw','subJaw','returnMode','cutZ','diameter','toolWidth','toolRadius','toolLength'];
+const defaults={reference:'stock',stock:0,allowance:0,grip:0,target:0,grab:0,end:0,chuckDistance:600/25.4,mainJaw:1.5,subJaw:1,returnMode:'empty',cutZ:0,diameter:1,toolWidth:.118,toolRadius:.011,toolLength:.4};
 let result,values,machine,mode='fusion',stage=0,approach=0,returnTravel=0,animation=null,motion=null,running=false;
-const key='lathe-transfer-v1.1',names=['Before grab','Sub clamps','Main opens','Pull','Main clamps','Sub opens','Return without material'];
+const key='lathe-transfer-v1.1',emptyNames=['Before grab','Sub clamps','Main opens','Pull','Main clamps','Sub opens','Return without material'];
+const materialNames=['Before grab','Sub clamps','Main opens','Pull','Main clamps','Cut-off','Tool retracts','Return with material'];
+let cut=null,cutProgress=0,retractProgress=0,workflowReady=false;
+const names=()=>values?.returnMode==='material'?materialNames:emptyNames;
 const fmt=n=>(Math.abs(n)<.00000001?0:n).toFixed(4)+'″',round=n=>String(Number(n.toFixed(8)));
-function read(){return {...Object.fromEntries(ids.map(id=>[id,id==='reference'?$(id).value:$(id).value.trim()===''?NaN:Number($(id).value)/(id==='chuckDistance'?25.4:1)])),mode};}
+function read(){return {...Object.fromEntries(ids.map(id=>[id,['reference','returnMode'].includes(id)?$(id).value:$(id).value.trim()===''?NaN:Number($(id).value)/(id==='chuckDistance'?25.4:1)])),mode};}
 function setFields(v){ids.forEach(id=>$(id).value=v[id]==null?'':id==='chuckDistance'?Number((v[id]*25.4).toFixed(8)):v[id]);}
 function stop(){if(animation)cancelAnimationFrame(animation);animation=null;motion=null;running=false;$('play').textContent='▶ Play trajectory';}
 function pause(){if(animation)cancelAnimationFrame(animation);animation=null;running=false;$('play').textContent='▶ Continue';}
 function resume(){if(!motion)return;running=true;motion.last=performance.now();$('play').textContent='❚❚ Pause';animation=requestAnimationFrame(tick);}
 function tick(now){if(!running||!motion)return;const current=motion;current.elapsed=Math.min(current.duration,current.elapsed+now-current.last);current.last=now;current.callback(current.elapsed/current.duration);draw();if(current.elapsed<current.duration)animation=requestAnimationFrame(tick);else{motion=null;animation=null;current.done();}}
-function persist(){try{localStorage.setItem(key,JSON.stringify({version:'1.3',parameters:read()}));}catch(e){}}
+function persist(){try{localStorage.setItem(key,JSON.stringify({version:'1.4',parameters:read()}));}catch(e){}}
 function update(save=true){
- stop();stage=0;approach=0;returnTravel=0;$('progress').value=0;values=read();result=null;machine=null;
+ stop();stage=0;approach=0;returnTravel=0;$('progress').value=0;values=read();result=null;machine=null;cut=null;cutProgress=0;retractProgress=0;workflowReady=false;$('cutFields').hidden=values.returnMode!=='material';renderSteps();
  $('error').textContent='';$('notice').textContent='';$('message').textContent='';$('results').innerHTML='';$('play').disabled=true;$('save').disabled=true;
  ['grip','pull','front'].forEach(k=>$(k+'Out').textContent='—');
  try{
@@ -75,58 +87,77 @@ function update(save=true){
   $('results').innerHTML=[['Fixed G54 Z0 from main jaw face',fmt(result.O)],['Initial finished face / G54 Z',fmt(result.F)+' / '+fmt(result.F-result.O)],['Grab Plane (B)',fmt(result.grab)],['Return Plane (B)',fmt(result.end)],['Sub jaw face after pull / G54 B',fmt(result.end)],['Final finished face / G54 Z',fmt(result.front)+' / '+fmt(result.front-result.O)]].map(r=>'<tr><td>'+r[0]+'</td><td><code>'+r[1]+'</code></td></tr>').join('');
  }catch(e){$('error').textContent=e.message;}
  try{machine=geometry(values);}catch(e){$('notice').textContent=e.message;}
- if(result&&machine){try{validateEnvelope(values,result,machine);$('play').disabled=false;$('save').disabled=false;}catch(e){$('error').textContent=e.message;result=null;}}
+ if(result&&machine){try{validateEnvelope(values,result,machine);if(values.returnMode==='material')cut=cutGeometry(values,result);if(cut)$('results').innerHTML+=`<tr><td>Insert-to-sub-jaw clearance (insert only)</td><td><code>${fmt(cut.clearance)}</code></td></tr><tr><td>Separated part length</td><td><code>${fmt(cut.partLength)}</code></td></tr>`;workflowReady=true;$('play').disabled=false;$('save').disabled=false;}catch(e){$('error').textContent=e.message;workflowReady=false;}}
  draw();if(save)persist();
 }
 function draw(){
  const r=result,g=machine,v=values;
- if(!g){$('view').innerHTML='<text x="50" y="180" fill="#aebdd1" font-size="20">Enter machine geometry to establish a fixed scale.</text>';$('state').textContent='Waiting for machine geometry.';return;}
- const scale=g.scale*Number($('zoom').value),x=n=>70+(n-g.left)*scale;
+ if(!g){$('view').innerHTML='';$('state').textContent='';return;}
+ const scale=g.scale,x=n=>70+(n-g.left)*scale,zoom=Number($('zoom').value),cy=195;
+ const material=v.returnMode==='material',returnStage=material?7:6;
  const p=stage<3?0:stage===3?Number($('progress').value)/100:1,d=r?r.pull*p:0;
- const smooth=approach*approach*(3-2*approach);
- const returnEase=returnTravel*returnTravel*(3-2*returnTravel);
- const jaw=r?(stage<2?g.home+(r.jaw-g.home)*smooth:stage===6?r.jaw+r.pull+(g.home-r.jaw-r.pull)*returnEase:r.jaw+d):g.home;
- const mainOpen=stage===2||stage===3,subOpen=stage>=5||stage===0||(stage===1&&approach<1);
- const rect=(a,w,y,h,fill)=>`<rect x="${x(a)}" y="${y}" width="${w*scale}" height="${h}" fill="${fill}" rx="3"/>`;
- const line=(pos,color,label,y)=>`<line x1="${x(pos)}" x2="${x(pos)}" y1="90" y2="320" stroke="${color}" stroke-dasharray="5 5"/><text x="${x(pos)+4}" y="${y}" fill="${color}" font-size="13">${label}</text>`;
- let svg=`<line x1="35" x2="970" y1="195" y2="195" stroke="#506078" stroke-dasharray="6 5"/>`;
- if(r)svg+=rect(g.left,r.F+d-g.left,169,52,'#55cbb7');
- svg+=rect(-v.mainJaw-.65,.65,115,160,'#445873');
- svg+=rect(-v.mainJaw,v.mainJaw,mainOpen?120:135,34,'#8796ac')+rect(-v.mainJaw,v.mainJaw,mainOpen?236:221,34,'#8796ac');
- svg+=rect(jaw+v.subJaw,.65,115,54,'#445873')+rect(jaw+v.subJaw,.65,221,54,'#445873');
- svg+=rect(jaw,v.subJaw,subOpen?120:135,34,'#8796ac')+rect(jaw,v.subJaw,subOpen?236:221,34,'#8796ac');
+ const smooth=approach*approach*(3-2*approach),returnEase=returnTravel*returnTravel*(3-2*returnTravel);
+ const jaw=r?(stage<2?g.home+(r.jaw-g.home)*smooth:stage===returnStage?r.jaw+r.pull+(g.home-r.jaw-r.pull)*returnEase:r.jaw+d):g.home;
+ const shift=r&&stage===returnStage?jaw-r.jaw-r.pull:0;
+ const separated=material&&cut&&(stage>5||stage===5&&cutProgress>=1);
+ const mainOpen=stage===2||stage===3,subOpen=stage===0||(stage===1&&approach<1)||!material&&stage>=5;
+ const radius=Number.isFinite(v.diameter)&&v.diameter>0?v.diameter/2:26/scale;
+ const radialBody=Math.max(radius+1,2),jawThickness=.6,gap=radius+(mainOpen?.4:0),subGap=radius+(subOpen?.4:0);
+ const labels=[];
+ const label=(pos,color,text,y)=>labels.push({pos,color,text,y});
+ const rect=(a,w,y,h,fill,attrs='')=>`<rect x="${x(a)}" y="${y}" width="${Math.max(0,w*scale)}" height="${Math.max(0,h)}" fill="${fill}" ${attrs}/>`;
+ const line=(pos,color,text,y)=>{label(pos,color,text,y);return `<line x1="${x(pos)}" x2="${x(pos)}" y1="90" y2="320" stroke="${color}" stroke-dasharray="5 5"/>`;};
+ let svg=`<g id="scene" transform="translate(${x(0)} ${cy}) scale(${zoom}) translate(${-x(0)} ${-cy})"><line x1="35" x2="970" y1="${cy}" y2="${cy}" stroke="#506078" stroke-dasharray="6 5"/>`;
+ if(r){if(separated){svg+=rect(g.left,cut.left-g.left,cy-radius*scale,2*radius*scale,'#55cbb7','data-part="bar"')+rect(cut.right+shift,cut.partLength,cy-radius*scale,2*radius*scale,'#55cbb7','data-part="piece"');}else svg+=rect(g.left,r.F+d-g.left,cy-radius*scale,2*radius*scale,'#55cbb7','data-part="bar"');}
+ svg+=rect(-v.mainJaw-.65,.65,cy-radialBody*scale,2*radialBody*scale,'#445873');
+ svg+=rect(-v.mainJaw,v.mainJaw,cy-(gap+jawThickness)*scale,jawThickness*scale,'#8796ac')+rect(-v.mainJaw,v.mainJaw,cy+gap*scale,jawThickness*scale,'#8796ac');
+ svg+=rect(jaw+v.subJaw,.65,cy-radialBody*scale,(radialBody-radius)*scale,'#445873')+rect(jaw+v.subJaw,.65,cy+radius*scale,(radialBody-radius)*scale,'#445873');
+ svg+=rect(jaw,v.subJaw,cy-(subGap+jawThickness)*scale,jawThickness*scale,'#8796ac')+rect(jaw,v.subJaw,cy+subGap*scale,jawThickness*scale,'#8796ac');
  svg+=line(0,'#aebdd1','Main jaw · 0',335)+line(g.home,'#63758e','Sub jaw at return',365);
- svg+=`<text x="${x(-v.mainJaw)}" y="65" fill="#9bacc3" font-size="13">MAIN CHUCK</text><text x="${x(jaw+v.subJaw)-30}" y="65" fill="#9bacc3" font-size="13">SUB CHUCK</text><text x="${x(jaw)}" y="100" fill="#cbd7e8" font-size="13">Sub jaw · ${r?fmt(jaw-r.O):"—"}</text>`;
- if(r){svg+=`<rect x="${x(r.F)}" y="169" width="${v.allowance*scale}" height="52" fill="none" stroke="#ffbd73" stroke-dasharray="3 3"/>`+line(r.O,'#c79cff','G54 · Z0 / B0',85)+line(r.F+d,'#55cbb7','Model face · '+fmt(r.F+d),300);}
- $('view').innerHTML=svg;
- $('state').textContent=r?names[stage]+(stage===1?' · '+Math.round(approach*100)+'%':stage===3?' · '+Math.round(p*100)+'%':stage===6?' · '+Math.round(returnTravel*100)+'%':''):'';
- [...$('steps').children].forEach((b,i)=>{b.classList.toggle('active',i===stage);b.disabled=!r;});$('progress').disabled=!r;
+ label(-v.mainJaw,'#9bacc3','MAIN CHUCK',40);label(jaw+v.subJaw,'#9bacc3','SUB CHUCK',40);label(jaw,'#cbd7e8','Sub jaw · '+(r?fmt(jaw-r.O):'—'),100);
+ if(r){svg+=`<rect x="${x(r.F)}" y="${cy-radius*scale}" width="${v.allowance*scale}" height="${2*radius*scale}" fill="none" stroke="#ffbd73" stroke-dasharray="3 3"/>`+line(r.O,'#c79cff','G54 · Z0 / B0',85)+line(r.F+d+(separated?shift:0),'#55cbb7','Model face · '+fmt(r.F+d+(separated?shift:0)),300);}
+ if(material&&cut){
+  const feed=stage<5?0:stage===5?cutProgress:1,retract=stage<6?0:stage===6?retractProgress:1;
+  const topTip=radius+.2,bottomTip=-v.toolRadius,tip=topTip+(bottomTip-topTip)*feed+(topTip-bottomTip)*retract;
+  const bottom=cy-tip*scale,top=bottom-v.toolLength*scale,left=x(cut.left),right=x(cut.right),rr=v.toolRadius*scale;
+  if(stage===5&&tip<radius){const stockTop=cy-radius*scale;svg+=`<defs><clipPath id="kerfClip"><rect x="${left}" y="${stockTop}" width="${v.toolWidth*scale}" height="${2*radius*scale}"/></clipPath></defs><g id="kerfSweep"><path data-part="kerf" clip-path="url(#kerfClip)" d="M ${left} ${stockTop-rr} H ${right} V ${bottom-rr} A ${rr} ${rr} 0 0 1 ${right-rr} ${bottom} H ${left+rr} A ${rr} ${rr} 0 0 1 ${left} ${bottom-rr} Z" fill="#141e2e"/></g><use href="#kerfSweep" transform="translate(0 ${2*cy}) scale(1 -1)"/>`;}
+  svg+=`<path data-tool="insert" d="M ${left} ${top} H ${right} V ${bottom-rr} A ${rr} ${rr} 0 0 1 ${right-rr} ${bottom} H ${left+rr} A ${rr} ${rr} 0 0 1 ${left} ${bottom-rr} Z" fill="#e6b740" stroke="#a77c17" stroke-width="1"/><circle data-tool="reference" data-radial-position="${tip}" cx="${left}" cy="${bottom}" r="2" fill="#ff7979"/>`;
+  svg+=line(cut.left,'#e6b740','Cut-off · Z'+round(v.cutZ),385);
+ }
+ svg+='</g>';svg+=labels.map(l=>`<text x="${x(0)+(x(l.pos)-x(0))*zoom+4}" y="${l.y}" fill="${l.color}" font-size="13">${l.text}</text>`).join('');$('view').innerHTML=svg;
+ $('state').textContent=r?names()[stage]+(stage===1?' · '+Math.round(approach*100)+'%':stage===3?' · '+Math.round(p*100)+'%':stage===returnStage?' · '+Math.round(returnTravel*100)+'%':material&&stage===5?' · '+Math.round(cutProgress*100)+'%':material&&stage===6?' · '+Math.round(retractProgress*100)+'%':''):'';
+ [...$('steps').children].forEach((b,i)=>{b.classList.toggle('active',i===stage);b.disabled=!workflowReady;});$('progress').disabled=!workflowReady;
 }
 function move(duration,callback,done){motion={duration,callback,done,elapsed:0,last:performance.now()};resume();}
-function selectStage(i){stop();if(!result||!machine)return;stage=i;returnTravel=0;$('progress').value=i>3?100:0;if(i===0||i===1){const from=approach,to=i===1?1:0;move(1600,t=>approach=from+(to-from)*t,()=>{stop();draw();});}else{approach=1;if(i===6)move(2200,t=>returnTravel=t,()=>{stop();draw();});else draw();}}
-names.forEach((name,i)=>{const b=document.createElement('button');b.textContent=(i+1)+'. '+name;b.onclick=()=>selectStage(i);$('steps').append(b);});
+function stageMotion(i,done){
+ const material=values.returnMode==='material';
+ if(i===1)move(2200,t=>approach=t,done);
+ else if(i===3)move(3200,t=>$('progress').value=t*100,done);
+ else if(material&&i===5)move(2600,t=>cutProgress=t,done);
+ else if(material&&i===6)move(1600,t=>retractProgress=t,done);
+ else if(i===(material?7:6))move(2200,t=>returnTravel=t,done);
+ else done();
+}
+function selectStage(i){stop();if(!workflowReady)return;const from=approach;stage=i;returnTravel=0;cutProgress=i>5?1:0;retractProgress=i>6?1:0;$('progress').value=i>3?100:0;if(i<2){approach=from;draw();move(1600,t=>approach=from+((i===1?1:0)-from)*t,()=>{stop();draw();});}else{approach=1;draw();stageMotion(i,()=>{stop();draw();});}}
+function renderSteps(){$('steps').replaceChildren();names().forEach((name,i)=>{const b=document.createElement('button');b.textContent=(i+1)+'. '+name;b.onclick=()=>selectStage(i);$('steps').append(b);});}
 ids.forEach(id=>$(id).addEventListener('input',()=>{if(id==='reference'&&$('reference').value==='model')$('allowance').value=0;if(['grip','target'].includes(id))mode='physical';if(['grab','end'].includes(id))mode='fusion';update();}));
 $('zoom').oninput=()=>draw();
 $('progress').oninput=()=>{stop();stage=3;approach=1;draw();};
 $('play').onclick=()=>{
  if(running){pause();return;}
  if(motion){resume();return;}
- stop();if(!result||!machine)return;
- stage=0;approach=0;returnTravel=0;$('progress').value=0;draw();
+ stop();if(!workflowReady)return;
+ stage=0;approach=0;returnTravel=0;cutProgress=0;retractProgress=0;$('progress').value=0;draw();
  const hold=done=>move(600,()=>{},done);
  const next=()=>{
-  if(stage>=6){stop();return;}
-  stage++;draw();
-  if(stage===1)move(2200,t=>approach=t,()=>hold(next));
-  else if(stage===3)move(3200,t=>$('progress').value=t*100,()=>hold(next));
-  else if(stage===6)move(2200,t=>returnTravel=t,()=>hold(()=>stop()));
-  else hold(next);
+  if(stage>=names().length-1){stop();return;}
+  stage++;draw();stageMotion(stage,()=>hold(next));
  };
  hold(next);
 };
-$('save').onclick=()=>{if(!result||!machine)return;const a=document.createElement('a'),url=URL.createObjectURL(new Blob([JSON.stringify({version:'1.3',parameters:read()},null,2)],{type:'application/json'}));a.href=url;a.download='lathe-transfer-v1.3.json';a.click();setTimeout(()=>URL.revokeObjectURL(url),1000);};
-function parseCase(data){if(!['1.0','1.1','1.2','1.3'].includes(data.version)||!data.parameters)throw Error('Unsupported case format.');const v={...defaults,...data.parameters};if(!['stock','model'].includes(v.reference)||!['physical','fusion'].includes(v.mode)||ids.some(id=>id!=='reference'&&!(id==='chuckDistance'&&v[id]===null)&&(!Number.isFinite(v[id]))))throw Error('Invalid case parameters.');calculate(v);return v;}
+$('save').onclick=()=>{if(!workflowReady)return;const a=document.createElement('a'),url=URL.createObjectURL(new Blob([JSON.stringify({version:'1.4',parameters:read()},null,2)],{type:'application/json'}));a.href=url;a.download='lathe-transfer-v1.4.json';a.click();setTimeout(()=>URL.revokeObjectURL(url),1000);};
+function parseCase(data){if(!['1.0','1.1','1.2','1.3','1.4'].includes(data.version)||!data.parameters)throw Error('Unsupported case format.');const v={...defaults,...data.parameters};if(!['stock','model'].includes(v.reference)||!['physical','fusion'].includes(v.mode)||!['empty','material'].includes(v.returnMode)||ids.some(id=>!['reference','returnMode'].includes(id)&&!(id==='chuckDistance'&&v[id]===null)&&(!Number.isFinite(v[id]))))throw Error('Invalid case parameters.');calculate(v);return v;}
 $('load').onchange=async e=>{try{const v=parseCase(JSON.parse(await e.target.files[0].text()));mode=v.mode;setFields(v);update();if(!Number.isFinite(v.chuckDistance))$('notice').textContent='Case loaded. Enter chuck distance to enable the fixed-scale simulation.';}catch(e){$('error').textContent=e.message;}finally{$('load').value='';}};
 $('reset').onclick=()=>{const current=read();mode='fusion';setFields({...defaults,chuckDistance:Number.isFinite(current.chuckDistance)?current.chuckDistance:null,mainJaw:current.mainJaw,subJaw:current.subJaw});update();};
-setFields(defaults);try{const saved=JSON.parse(localStorage.getItem(key));if(saved&&['1.1','1.2','1.3'].includes(saved.version)){const v=saved.parameters;if(v&&['stock','model'].includes(v.reference)&&['fusion','physical'].includes(v.mode)){setFields({...defaults,...v,chuckDistance:v.chuckDistance??defaults.chuckDistance});mode=v.mode;}}}catch(e){}update();
+setFields(defaults);try{const saved=JSON.parse(localStorage.getItem(key));if(saved&&['1.1','1.2','1.3','1.4'].includes(saved.version)){const v=saved.parameters;if(v&&['stock','model'].includes(v.reference)&&['fusion','physical'].includes(v.mode)){setFields({...defaults,...v,chuckDistance:v.chuckDistance??defaults.chuckDistance});mode=v.mode;}}}catch(e){}update();
 </script></html>
