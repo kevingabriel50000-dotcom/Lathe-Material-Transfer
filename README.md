@@ -1,4 +1,4 @@
-# Lathe Material Transfer v1.2
+# Lathe Material Transfer v1.3
 
 Portable, English-language main/sub spindle transfer visualizer. Open `index.html` in Edge, Chrome or Firefox, or use the GitHub Pages deployment. No build step, dependencies or Internet connection are required for the downloaded file.
 
@@ -32,3 +32,7 @@ After the main clamps, the sub opens and returns home without material; the bar 
 ## Validation
 
 `node tests/calculations.cjs` checks calculation examples, both-direction equivalence and geometry constraints. For browser regression checks, with Playwright available, start `python3 -m http.server 8765 --bind 127.0.0.1` and run `node tests/browser.cjs`. Optionally set `CHROMIUM_PATH` to a browser executable or `APP_URL` to a different local test server. The 20-inch distance in that test is synthetic, not a Lynx specification. No application build is needed.
+
+## Base version
+
+The Git tag `v1.3` preserves the approved base program. Future changes must not move or replace this tag.
