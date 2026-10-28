@@ -33,6 +33,9 @@ const assert=require('node:assert/strict');
 await page.getByRole('button',{name:'4. Pull',exact:true}).click();await page.clock.runFor(3400);assert.match(await page.locator('#view').textContent(),/Model face · 3.0000/);
 await page.getByRole('button',{name:'8. Return with material',exact:true}).click();await page.clock.runFor(1100);assert.ok(Number(await page.locator('#modelPlane').getAttribute('x1'))>Number(await page.locator('#g54Plane').getAttribute('x1')));await page.clock.runFor(1200);assert.match(await page.locator('#view').textContent(),/Model face · 1.9500/);
 const referenceOffset=await offset();assert.ok(Math.abs(referenceOffset+.05*800/(700/25.4+2))<1e-8);
+await page.locator('#reference').selectOption('model');await page.locator('#allowance').fill('.05');assert.match(await page.locator('#view').textContent(),/Model face · 1.9500/);
+await page.getByRole('button',{name:'8. Return with material',exact:true}).click();await page.clock.runFor(2300);assert.match(await page.locator('#view').textContent(),/Model face · 1.9500/);assert.ok(Math.abs(await offset())<1e-8);
+assert.equal(await page.locator('#cutFields input').count(),2);assert.equal(await page.locator('#cutFields #diameter').count(),0);await page.locator('#returnMode').selectOption('empty');assert.equal(await page.locator('#diameter').isVisible(),true);
 assert.deepEqual(errors,[]);console.log('View checks passed: cursor-anchored zoom, thin strokes, cutting trace, next model face, jaw-to-part distance and timeline reset.');
  }finally{await browser.close();}
 })().catch(e=>{console.error(e);process.exit(1)});
