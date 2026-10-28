@@ -1,0 +1,12 @@
+const fs=require('node:fs');
+const path=require('node:path');
+const root=path.resolve(__dirname,'..'),stage=path.join(root,'.stage');
+const manifest=JSON.parse(fs.readFileSync(path.join(root,'package.json'),'utf8'));
+const source=path.resolve(root,'..','web');
+if(!fs.existsSync(path.join(source,'index.html')))throw Error('web/index.html is missing.');
+fs.rmSync(stage,{recursive:true,force:true});
+fs.mkdirSync(stage,{recursive:true});
+fs.cpSync(source,path.join(stage,'web'),{recursive:true});
+fs.copyFileSync(path.join(root,'main.cjs'),path.join(stage,'main.cjs'));
+fs.writeFileSync(path.join(stage,'package.json'),JSON.stringify({name:'lathe-material-transfer',version:manifest.version,description:manifest.description,author:'Lathe Material Transfer',main:'main.cjs'},null,2)+'\n');
+console.log('Desktop stage prepared from web/.');

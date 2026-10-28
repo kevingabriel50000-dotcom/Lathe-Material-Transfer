@@ -1,0 +1,33 @@
+{
+  "name": "lathe-material-transfer-windows",
+  "version": "1.5.0",
+  "private": true,
+  "description": "Portable Windows desktop packaging for Lathe Material Transfer",
+  "scripts": {
+    "stage": "node scripts/stage.cjs",
+    "start": "npm run stage && electron .stage",
+    "test": "npm run stage && node scripts/smoke.cjs",
+    "package": "npm run stage && electron-builder --win zip --x64 --publish never"
+  },
+  "devDependencies": {
+    "electron": "45.1.0",
+    "electron-builder": "26.18.0",
+    "playwright-core": "1.64.1"
+  },
+  "build": {
+    "appId": "com.lathematerialtransfer.desktop",
+    "productName": "Lathe Material Transfer",
+    "directories": {
+      "app": ".stage",
+      "output": "dist"
+    },
+    "asar": true,
+    "files": ["main.cjs", "package.json", "web/**/*"],
+    "win": {
+      "target": [{"target": "zip", "arch": ["x64"]}],
+      "executableName": "Lathe Material Transfer",
+      "signAndEditExecutable": false
+    },
+    "artifactName": "Lathe-Material-Transfer-v1.5-Windows-x64.zip"
+  }
+}

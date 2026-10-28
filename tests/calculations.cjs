@@ -1,5 +1,5 @@
 const fs=require('node:fs'),vm=require('node:vm'),assert=require('node:assert/strict');
-const html=fs.readFileSync(require('node:path').join(__dirname,'../index.html'),'utf8');
+const html=fs.readFileSync(require('node:path').join(__dirname,'../web/index.html'),'utf8');
 const source=html.split('<script>')[1].split('const $=')[0];const ctx={};vm.createContext(ctx);vm.runInContext(source,ctx);
 const base={mode:'fusion',reference:'stock',stock:2,allowance:.025,grab:-1,end:.0001,grip:1,target:3,epsilon:.0001};
 const near=(a,b)=>assert.ok(Math.abs(a-b)<1e-9,`${a} != ${b}`);
