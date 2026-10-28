@@ -8,7 +8,7 @@ input:disabled{opacity:.6}button:disabled{opacity:.4;cursor:default}.field-pair{
 <header><h1>Lathe Material Transfer <span class="badge">v1.1</span></h1><p>Fusion planes ↔ physical material movement · inches</p></header>
 <main><aside><h2>Machine geometry</h2>
 <label for="chuckDistance">Chuck face-to-face distance at sub return (in)</label><input id="chuckDistance" type="number" min="0" step="0.0001" placeholder="Required — measure your machine">
-<p class="muted">Lynx 2100LSY: distance not verified. Enter the distance between chuck faces, excluding jaws, with the sub at its return position. This sets the fixed drawing scale; it is not constant during sub movement.</p>
+<p class="muted">Lynx 2100LSY: user-provided default 600 mm (23.6220 in), between chuck faces without jaws, with the sub at return. Editable to match your machine. This sets the fixed drawing scale; it is not constant during sub movement.</p>
 <div class="field-pair"><div><label for="mainJaw">Main jaw length (in)</label><input id="mainJaw" type="number" min="0" step="0.0001" value="1.5"></div><div><label for="subJaw">Sub jaw length (in)</label><input id="subJaw" type="number" min="0" step="0.0001" value="1"></div></div>
 <h2 style="margin-top:24px">Transfer setup</h2><label for="reference">G54 Z0 / Feed plane B0 reference</label><select id="reference"><option value="stock">Stock front</option><option value="model">Model front</option></select>
 <label for="stock">Stick Out/protruding (in)</label><input id="stock" type="number" step="0.0001" value="0">
@@ -51,7 +51,7 @@ function validateEnvelope(v,r,g){
  if(r.F>=g.home||r.jaw+r.pull>g.home+1e-9||r.front>g.home+v.subJaw+1e-9)throw Error('Transfer exceeds the configured return-position envelope. Check chuck distance and transfer values.');
 }
 const $=id=>document.getElementById(id),ids=['reference','stock','allowance','grip','target','epsilon','grab','end','chuckDistance','mainJaw','subJaw'];
-const defaults={reference:'stock',stock:0,allowance:0,grip:0,target:0,epsilon:.0001,grab:0,end:0,chuckDistance:null,mainJaw:1.5,subJaw:1};
+const defaults={reference:'stock',stock:0,allowance:0,grip:0,target:0,epsilon:.0001,grab:0,end:0,chuckDistance:600/25.4,mainJaw:1.5,subJaw:1};
 let result,values,machine,mode='fusion',stage=0,approach=0,animation=null,revision=0;
 const key='lathe-transfer-v1.1',names=['Before grab','Sub clamps','Main opens','Pull','Main clamps','After cut-off'];
 const fmt=n=>(Math.abs(n)<.00000001?0:n).toFixed(4)+'″',round=n=>String(Number(n.toFixed(8)));
@@ -110,5 +110,5 @@ $('save').onclick=()=>{if(!result||!machine)return;const a=document.createElemen
 function parseCase(data){if(!['1.0','1.1'].includes(data.version)||!data.parameters)throw Error('Unsupported case format.');const v={...defaults,...data.parameters};if(!['stock','model'].includes(v.reference)||!['physical','fusion'].includes(v.mode)||ids.some(id=>id!=='reference'&&!(id==='chuckDistance'&&v[id]===null)&&(!Number.isFinite(v[id]))))throw Error('Invalid case parameters.');calculate(v);return v;}
 $('load').onchange=async e=>{try{const v=parseCase(JSON.parse(await e.target.files[0].text()));mode=v.mode;setFields(v);update();if(!Number.isFinite(v.chuckDistance))$('notice').textContent='Case loaded. Enter chuck distance to enable the fixed-scale simulation.';}catch(e){$('error').textContent=e.message;}finally{$('load').value='';}};
 $('reset').onclick=()=>{const current=read();mode='fusion';setFields({...defaults,chuckDistance:Number.isFinite(current.chuckDistance)?current.chuckDistance:null,mainJaw:current.mainJaw,subJaw:current.subJaw});update();};
-setFields(defaults);try{const saved=JSON.parse(localStorage.getItem(key));if(saved&&saved.version==='1.1'){const v=saved.parameters;if(v&&['stock','model'].includes(v.reference)&&['fusion','physical'].includes(v.mode)){setFields({...defaults,...v});mode=v.mode;}}}catch(e){}update();
+setFields(defaults);try{const saved=JSON.parse(localStorage.getItem(key));if(saved&&saved.version==='1.1'){const v=saved.parameters;if(v&&['stock','model'].includes(v.reference)&&['fusion','physical'].includes(v.mode)){setFields({...defaults,...v,chuckDistance:v.chuckDistance??defaults.chuckDistance});mode=v.mode;}}}catch(e){}update();
 </script></html>

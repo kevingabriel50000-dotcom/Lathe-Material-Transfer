@@ -6,9 +6,9 @@ Portable, English-language main/sub spindle transfer visualizer. Open `index.htm
 
 Enter the **chuck face-to-face distance with the sub at its machine return position**, excluding jaws. This distance establishes a fixed view scale; changing transfer planes does not rescale the machine or move the fixed G54 origin. The sub chuck moves during the transfer, so instantaneous chuck separation changes.
 
-Main jaw length defaults to **1.5 in**, sub jaw length to **1.0 in**, both editable. The distance is intentionally blank: a Lynx 2100LSY chuck-face distance has not been verified. Manufacturer/distributor web requests were blocked in the development environment. Do not substitute between-centers distance, turning length or axis travel for this measurement. These are different dimensions. Use the machine documentation or a measured return-position distance.
+Main jaw length defaults to **1.5 in**, sub jaw length to **1.0 in**, both editable. Chuck distance defaults to **600 mm (600/25.4 = 23.622047244… in)**, supplied by the user for the Lynx 2100LSY, not independently verified against manufacturer documentation. The application retains the conversion precision. Existing saved nonempty geometry is preserved; a previously blank browser distance is filled with this default. Do not substitute between-centers distance, turning length or axis travel for chuck-face distance.
 
-A new browser starts with zero transfer inputs and prompts for setup. The last inputs are automatically restored in that browser when local storage is available. **New case** resets transfer inputs while preserving machine geometry. JSON case files provide explicit backups and transfers between computers. v1.0 case imports remain supported; add machine geometry after importing them.
+A new browser starts with zero transfer inputs and prompts for setup. The last inputs are automatically restored in that browser when local storage is available. **New case** resets transfer inputs while preserving machine geometry. JSON case files provide explicit backups and transfers between computers. v1.0 case imports remain supported; v1.0 files without machine geometry use the current defaults.
 
 ## Linked values
 
