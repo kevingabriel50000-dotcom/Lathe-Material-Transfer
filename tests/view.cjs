@@ -29,6 +29,10 @@ const assert=require('node:assert/strict');
   await page.locator('#cutZ').fill('.1');await page.locator('#chuckDistance').fill('700');await page.getByRole('button',{name:'8. Return with material',exact:true}).click();await page.clock.runFor(2300);
   assert.match(await page.locator('#returnResults').textContent(),/0.2820/);assert.match(await page.locator('#view').textContent(),/Model face · 1.9750/);assert.equal(await page.locator('#subCutOut').textContent(),'0.2820″');const ends=await page.locator('#subPartDimension').evaluate(p=>({face:Number(p.dataset.face),jaw:Number(p.dataset.jaw)}));assert.ok(Math.abs(ends.jaw-ends.face-.282)<1e-9);assert.ok(Math.abs(Number(await page.locator('[data-part="piece"]').getAttribute('x'))-Number(await page.locator('#subPartCutPlane').getAttribute('x1')))<1e-9);
   await page.locator('#resetTrajectory').click();assert.equal(await page.locator('#state').textContent(),'Before grab');assert.equal(await page.locator('#progress').inputValue(),'0');assert.equal(await page.locator('#returnDistances').isVisible(),false);assert.equal(await page.locator('#cutPlane').count(),0);assert.equal(await page.locator('#zoom').inputValue(),'3');assert.equal(await page.locator('#stock').inputValue(),'2');
-  assert.deepEqual(errors,[]);console.log('View checks passed: cursor-anchored zoom, thin strokes, cutting trace, next model face, jaw-to-part distance and timeline reset.');
+  for(const[id,value]of Object.entries({stock:'2',allowance:'.05',grab:'-.85',end:'.2',cutZ:'-1'}))await page.locator('#'+id).fill(value);
+await page.getByRole('button',{name:'4. Pull',exact:true}).click();await page.clock.runFor(3400);assert.match(await page.locator('#view').textContent(),/Model face · 1.9500/);
+await page.getByRole('button',{name:'8. Return with material',exact:true}).click();await page.clock.runFor(2300);assert.match(await page.locator('#view').textContent(),/Model face · 1.9500/);
+const referenceOffset=await offset();assert.ok(Math.abs(referenceOffset+.05*800/(700/25.4+2))<1e-8);
+assert.deepEqual(errors,[]);console.log('View checks passed: cursor-anchored zoom, thin strokes, cutting trace, next model face, jaw-to-part distance and timeline reset.');
  }finally{await browser.close();}
 })().catch(e=>{console.error(e);process.exit(1)});
